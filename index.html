@@ -18,6 +18,16 @@
     --card:#FBFAF7;
     --radius:2px;
   }
+  [data-theme="dark"]{
+    --paper:#14171A;
+    --paper-2:#1D2126;
+    --ink:#EEEFEA;
+    --ink-soft:#B7B9B1;
+    --accent:#9AA0E8;
+    --sage:#A8B18C;
+    --line:#2E3338;
+    --card:#1D2126;
+  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -52,6 +62,21 @@
     font-style:italic;
     color:var(--accent);
   }
+  .theme-toggle{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    border-radius:var(--radius);
+    padding:8px 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .theme-toggle:hover{border-color:var(--accent); color:var(--ink);}
   .tagline{
     font-family:'IBM Plex Mono',monospace;
     font-size:11px;
@@ -364,6 +389,11 @@
     line-height:1.5;
   }
   .error-note b{display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; margin-bottom:4px;}
+  [data-theme="dark"] .error-note{
+    border-color:#7A3A30;
+    background:#2A1D1A;
+    color:#E8AFA4;
+  }
 
   .spinner-note{
     font-family:'IBM Plex Mono',monospace;
@@ -379,7 +409,10 @@
 
   <header class="top">
     <div class="brandmark">Specimen<span>.</span></div>
-    <div class="tagline">A palette &amp; type sheet<br>generated for one brand at a time</div>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+      <div class="tagline">A palette &amp; type sheet<br>generated for one brand at a time</div>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Dark</button>
+    </div>
   </header>
 
   <div class="layout">
@@ -451,6 +484,27 @@ const GENERATION_TIMEOUT_MS = 180000;
 const form = document.getElementById('genForm');
 const submitBtn = document.getElementById('submitBtn');
 const resultPanel = document.getElementById('resultPanel');
+const themeToggle = document.getElementById('themeToggle');
+
+// Theme: stored choice wins, otherwise follow the OS preference.
+(function initTheme(){
+  let theme = null;
+  try { theme = localStorage.getItem('specimen-theme'); } catch (e) {}
+  if (!theme) {
+    theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ? 'dark' : 'light';
+  }
+  applyTheme(theme);
+})();
+themeToggle.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('specimen-theme', next); } catch (e) {}
+});
+function applyTheme(theme){
+  document.documentElement.dataset.theme = theme;
+  themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+}
 const dropzone = document.getElementById('dropzone');
 const logoInput = document.getElementById('logoInput');
 const dropzoneLabel = document.getElementById('dropzoneLabel');
