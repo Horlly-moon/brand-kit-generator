@@ -442,7 +442,7 @@
 // You can also override per-visit with ?webhook=https://… (handy for testing
 // tunnels without redeploying).
 // ---------------------------------------------------------------------------
-const DEFAULT_WEBHOOK_URL = 'https://REPLACE-WITH-YOUR-N8N-HOST/webhook/brand-kit-generate';
+const DEFAULT_WEBHOOK_URL = 'http://localhost:5678/webhook/brand-kit-generate';
 const WEBHOOK_URL = new URLSearchParams(location.search).get('webhook') || DEFAULT_WEBHOOK_URL;
 
 // Generation takes ~2 minutes (Google Fonts + LLM + validation), so allow 3.
