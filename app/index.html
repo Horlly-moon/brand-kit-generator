@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specimen — Brand Kit Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEEFEA;
+    --paper-2:#E4E5DE;
+    --ink:#14171A;
+    --ink-soft:#4B4F51;
+    --accent:#4A4E9E;
+    --sage:#8B9474;
+    --line:#C9CAC2;
+    --card:#FBFAF7;
+    --radius:2px;
+  }
+  [data-theme="dark"]{
+    --paper:#14171A;
+    --paper-2:#1D2126;
+    --ink:#EEEFEA;
+    --ink-soft:#B7B9B1;
+    --accent:#9AA0E8;
+    --sage:#A8B18C;
+    --line:#2E3338;
+    --card:#1D2126;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:48px 28px 96px;
+  }
+  header.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:24px;
+    margin-bottom:48px;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .brandmark{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:28px;
+    letter-spacing:-0.01em;
+  }
+  .brandmark span{
+    font-style:italic;
+    color:var(--accent);
+  }
+  .theme-toggle{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    border-radius:var(--radius);
+    padding:8px 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .theme-toggle:hover{border-color:var(--accent); color:var(--ink);}
+  .tagline{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    max-width:260px;
+    text-align:right;
+    line-height:1.6;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:40px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    .tagline{text-align:left;}
+  }
+
+  /* ---- Order form card ---- */
+  .form-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    position:sticky;
+    top:28px;
+  }
+  .form-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--sage);
+    display:block;
+    margin-bottom:6px;
+  }
+  .form-title{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    font-weight:500;
+    margin:0 0 22px;
+  }
+  label{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field{margin-bottom:18px;}
+  input[type=text], textarea, input[type=url]{
+    width:100%;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--line);
+    padding:8px 2px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    resize:none;
+    transition:border-color .15s ease;
+  }
+  input[type=text]:focus, textarea:focus, input[type=url]:focus{
+    outline:none;
+    border-bottom-color:var(--accent);
+  }
+  input::placeholder, textarea::placeholder{color:#9A9C93;}
+
+  .dropzone{
+    border:1px dashed var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .dropzone:hover{border-color:var(--accent); background:rgba(74,78,158,0.04);}
+  .dropzone.has-file{border-color:var(--sage); color:var(--ink);}
+  .dropzone input{display:none;}
+  .seed-swatches{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+  }
+  .seed-swatches .dot{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    border:1px solid var(--line);
+  }
+
+  button.submit{
+    width:100%;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    border-radius:var(--radius);
+    padding:14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:background .15s ease;
+    margin-top:6px;
+  }
+  button.submit:hover{background:var(--accent);}
+  button.submit:disabled{background:#B7B9B1; cursor:wait;}
+
+  .mode-note{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:12px;
+    line-height:1.5;
+  }
+  .mode-note b{color:var(--ink);}
+  .mode-note code{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    word-break:break-all;
+  }
+
+  /* ---- Result panel ---- */
+  .result-panel{min-height:400px;}
+  .empty-state{
+    border:1px dashed var(--line);
+    border-radius:var(--radius);
+    padding:80px 24px;
+    text-align:center;
+    color:var(--ink-soft);
+  }
+  .empty-state .num{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:15px;
+    color:var(--sage);
+    display:block;
+    margin-bottom:10px;
+  }
+  .empty-state p{
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14px;
+    max-width:340px;
+    margin:0 auto;
+    line-height:1.6;
+  }
+
+  .sheet-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .sheet-header h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:26px;
+    margin:0;
+  }
+  .sheet-header .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+
+  .swatch-row{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:36px;
+  }
+  .chip{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    width:128px;
+    padding-bottom:12px;
+    box-shadow:0 3px 0 rgba(20,23,26,0.05);
+    transition:transform .15s ease;
+  }
+  .chip:hover{transform:translateY(-3px);}
+  .chip .swatch{
+    height:96px;
+    border-radius:var(--radius) var(--radius) 0 0;
+    border-bottom:1px solid var(--line);
+  }
+  .chip .role{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding:10px 10px 2px;
+  }
+  .chip .hex{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    padding:0 10px;
+    font-weight:500;
+  }
+
+  .type-specimen{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px;
+    margin-bottom:28px;
+  }
+  .type-specimen .label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--sage);
+    margin-bottom:8px;
+  }
+  .heading-sample{
+    font-size:38px;
+    line-height:1.15;
+    margin:0 0 22px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--line);
+  }
+  .body-sample{
+    font-size:16px;
+    line-height:1.65;
+    color:var(--ink-soft);
+    max-width:60ch;
+  }
+  .font-names{
+    display:flex;
+    gap:32px;
+    margin-top:18px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .font-names b{color:var(--ink); font-weight:500;}
+
+  .rationale{
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:13.5px;
+    line-height:1.7;
+    color:var(--ink-soft);
+    border-left:2px solid var(--sage);
+    padding-left:16px;
+    margin-bottom:32px;
+  }
+
+  .refine-bar{
+    display:flex;
+    gap:10px;
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    flex-wrap:wrap;
+  }
+  .refine-bar input{
+    flex:1;
+    min-width:200px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:11px 12px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:13.5px;
+  }
+  .refine-bar input:focus{outline:none; border-color:var(--accent);}
+  .refine-bar button{
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:0 20px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .refine-bar button:hover{background:var(--ink); color:var(--paper);}
+
+  .version-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--ink-soft);
+    margin-top:12px;
+  }
+
+  .error-note{
+    border:1px solid #B34A3C;
+    background:#FBF1EF;
+    color:#8A362B;
+    border-radius:var(--radius);
+    padding:14px 16px;
+    font-size:13px;
+    margin-bottom:20px;
+    line-height:1.5;
+  }
+  .error-note b{display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; margin-bottom:4px;}
+  [data-theme="dark"] .error-note{
+    border-color:#7A3A30;
+    background:#2A1D1A;
+    color:#E8AFA4;
+  }
+
+  .spinner-note{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    padding:40px 0;
+    text-align:center;
+  }
+
+  /* ---- Tabs + gallery ---- */
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:32px;
+  }
+  .tab{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    border-radius:var(--radius);
+    padding:9px 22px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .tab:hover{border-color:var(--accent); color:var(--ink);}
+  .tab.active{background:var(--ink); border-color:var(--ink); color:var(--paper);}
+  .history-bar{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .history-bar input[type=text]{
+    flex:1;
+    min-width:180px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:11px 12px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:13.5px;
+    color:var(--ink);
+  }
+  .history-bar input[type=text]:focus{outline:none; border-color:var(--accent);}
+  .mine-only{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .history-bar button{
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:11px 20px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .history-bar button:hover{background:var(--ink); color:var(--paper);}
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
+    gap:16px;
+  }
+  .kit-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .kit-card h3{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:18px;
+    margin:0;
+  }
+  .kit-card .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .kit-card .dots{display:flex; gap:6px;}
+  .kit-card .dots .dot{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    border:1px solid var(--line);
+  }
+  .kit-card .fonts{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .kit-card .actions{display:flex; gap:8px; margin-top:4px;}
+  .kit-card .actions button{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:8px 0;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .kit-card .actions button:hover{background:var(--ink); color:var(--paper);}
+  .kit-card .actions button.danger{border-color:#B34A3C; color:#B34A3C;}
+  .kit-card .actions button.danger:hover{background:#B34A3C; color:#fff;}
+  [data-theme="dark"] .kit-card .actions button.danger{border-color:#7A3A30; color:#E8AFA4;}
+  [data-theme="dark"] .kit-card .actions button.danger:hover{background:#7A3A30; color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brandmark">Specimen<span>.</span></div>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+      <div class="tagline">A palette &amp; type sheet<br>generated for one brand at a time</div>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button type="button" class="tab active" id="tabOrder">Order</button>
+    <button type="button" class="tab" id="tabHistory">History</button>
+  </nav>
+
+  <div class="layout" id="orderView">
+
+    <!-- ORDER FORM -->
+    <div class="form-card">
+      <span class="form-eyebrow">01 — Order</span>
+      <h2 class="form-title">Describe the brand</h2>
+
+      <form id="genForm">
+        <div class="field">
+          <label for="brand_name">Brand name</label>
+          <input type="text" id="brand_name" placeholder="e.g. Foldwork Coffee" required>
+        </div>
+        <div class="field">
+          <label for="industry">Industry</label>
+          <input type="text" id="industry" placeholder="e.g. specialty coffee roaster" required>
+        </div>
+        <div class="field">
+          <label for="mood">Mood / keywords</label>
+          <textarea id="mood" rows="2" placeholder="warm, unpretentious, a little industrial"></textarea>
+        </div>
+        <div class="field">
+          <label for="avoid">Colors to avoid (optional)</label>
+          <input type="text" id="avoid" placeholder="e.g. neon green, baby pink">
+        </div>
+        <div class="field">
+          <label>Logo (optional — colors are extracted in-browser and used as seed tones)</label>
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="logoInput" accept="image/*">
+            <span id="dropzoneLabel">Click to upload a logo, or drop one here</span>
+          </div>
+          <div id="seedSwatches" class="seed-swatches"></div>
+        </div>
+
+        <button type="submit" class="submit" id="submitBtn">Generate kit</button>
+        <p class="mode-note" id="modeNote"><b>Live</b> — connected to the Brand Kit Generator workflow.<br><code id="endpointNote"></code></p>
+      </form>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-panel" id="resultPanel">
+      <div class="empty-state">
+        <span class="num">01</span>
+        <p>Fill in the brand brief on the left and generate a kit. Palette and type will appear here as a specimen sheet, ready to refine.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="historyView" hidden>
+    <div class="history-bar">
+      <input type="text" id="historySearch" placeholder="Search brand…">
+      <label class="mine-only"><input type="checkbox" id="mineOnly" checked> Mine only</label>
+      <button type="button" id="refreshGallery">Refresh</button>
+    </div>
+    <div id="galleryGrid" class="gallery-grid"></div>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Configuration.
+// Set your publicly reachable n8n production webhook URL here. The workflow
+// must be ACTIVE (published) in n8n. Note: `http://localhost:…` only works
+// in a browser running on the same machine as n8n, and an `https://` page
+// will block plain-`http://` calls as mixed content — for public visitors
+// expose n8n over https (e.g. `ngrok http 5678`) and paste that URL below.
+// You can also override per-visit with ?webhook=https://… (handy for testing
+// tunnels without redeploying).
+// ---------------------------------------------------------------------------
+const DEFAULT_WEBHOOK_URL = 'http://localhost:5678/webhook/brand-kit-generate';
+const WEBHOOK_URL = new URLSearchParams(location.search).get('webhook') || DEFAULT_WEBHOOK_URL;
+
+// Generation takes ~2 minutes (Google Fonts + LLM + validation), so allow 3.
+const GENERATION_TIMEOUT_MS = 180000;
+
+const form = document.getElementById('genForm');
+const submitBtn = document.getElementById('submitBtn');
+const resultPanel = document.getElementById('resultPanel');
+const themeToggle = document.getElementById('themeToggle');
+
+// Theme: stored choice wins, otherwise follow the OS preference.
+(function initTheme(){
+  let theme = null;
+  try { theme = localStorage.getItem('specimen-theme'); } catch (e) {}
+  if (!theme) {
+    theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ? 'dark' : 'light';
+  }
+  applyTheme(theme);
+})();
+themeToggle.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('specimen-theme', next); } catch (e) {}
+});
+function applyTheme(theme){
+  document.documentElement.dataset.theme = theme;
+  themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+}
+const dropzone = document.getElementById('dropzone');
+const logoInput = document.getElementById('logoInput');
+const dropzoneLabel = document.getElementById('dropzoneLabel');
+document.getElementById('endpointNote').textContent = 'Endpoint: ' + WEBHOOK_URL;
+
+let sessionId = 'sess-' + Math.random().toString(36).slice(2, 10);
+let lastResult = null;
+let lastBrief = null;
+let logoSeedColors = [];
+
+dropzone.addEventListener('click', () => logoInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent)'; });
+dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = ''; });
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  if(e.dataTransfer.files[0]) handleLogoFile(e.dataTransfer.files[0]);
+});
+logoInput.addEventListener('change', e => {
+  if(e.target.files[0]) handleLogoFile(e.target.files[0]);
+});
+function handleLogoFile(file){
+  dropzone.classList.add('has-file');
+  dropzoneLabel.textContent = 'Reading colors from ' + file.name + '…';
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      logoSeedColors = extractDominantColors(img, 5);
+      dropzoneLabel.textContent = '✓ ' + file.name + ' — ' + logoSeedColors.length + ' seed colors found';
+      renderSeedSwatches(logoSeedColors);
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderSeedSwatches(colors){
+  const el = document.getElementById('seedSwatches');
+  el.innerHTML = colors.map(hex =>
+    `<span class="dot" style="background:${hex}" title="${hex}"></span>`
+  ).join('');
+}
+
+// Downsamples the image onto a small canvas, buckets pixels by rounded RGB,
+// discards near-white/near-black/low-alpha pixels (usually background),
+// and returns the most frequent buckets as hex strings.
+function extractDominantColors(img, maxColors){
+  const canvas = document.createElement('canvas');
+  const size = 64; // downsample for speed; enough signal for dominant color buckets
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, size, size);
+
+  let data;
+  try {
+    data = ctx.getImageData(0, 0, size, size).data;
+  } catch (e){
+    // Canvas got tainted (cross-origin) or another read error — fail quietly, no seed colors.
+    return [];
+  }
+
+  const buckets = {};
+  const step = 24; // rounding step: groups nearby colors into the same bucket
+
+  for(let i = 0; i < data.length; i += 4){
+    const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+    if(a < 128) continue; // skip transparent pixels
+
+    const brightness = (r + g + b) / 3;
+    if(brightness > 245 || brightness < 12) continue; // skip near-white/near-black background
+
+    const key = [
+      Math.round(r / step) * step,
+      Math.round(g / step) * step,
+      Math.round(b / step) * step
+    ].join(',');
+
+    buckets[key] = (buckets[key] || 0) + 1;
+  }
+
+  const sorted = Object.entries(buckets).sort((a, b) => b[1] - a[1]);
+  return sorted.slice(0, maxColors).map(([key]) => {
+    const [r, g, b] = key.split(',').map(Number);
+    return rgbToHex(r, g, b);
+  });
+}
+
+function rgbToHex(r, g, b){
+  return '#' + [r, g, b].map(v => {
+    const h = Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0');
+    return h;
+  }).join('').toUpperCase();
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const brief = {
+    session_id: sessionId,
+    version: 1,
+    brand_name: document.getElementById('brand_name').value.trim(),
+    industry: document.getElementById('industry').value.trim(),
+    mood: document.getElementById('mood').value.trim(),
+    avoid_colors: document.getElementById('avoid').value.trim(),
+    logo_seed_colors: logoSeedColors,
+    refine_instruction: null
+  };
+  lastBrief = brief;
+  await generate(brief);
+});
+
+async function generate(payload){
+  setLoading(true);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GENERATION_TIMEOUT_MS);
+  try {
+    let res;
+    try {
+      res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+    } catch (networkErr) {
+      if (networkErr && networkErr.name === 'AbortError') {
+        throw new Error(
+          'Request timed out after ' + Math.round(GENERATION_TIMEOUT_MS / 1000) +
+          's. The workflow can take ~2 minutes — the run may still finish in n8n. ' +
+          'Wait a moment and try again, or check the n8n executions list.'
+        );
+      }
+      throw new Error(
+        'Network request failed (' + (networkErr && networkErr.message ? networkErr.message : 'fetch error') + '). ' +
+        'The endpoint is unreachable from this browser — likely causes: n8n is not running, ' +
+        'the URL is wrong, the page is https:// while the endpoint is http:// (mixed content is blocked), ' +
+        'or CORS is blocking the call.'
+      );
+    } finally {
+      clearTimeout(timer);
+    }
+    if (res.status === 404) {
+      throw new Error(
+        'Webhook returned 404. The URL path is wrong, the workflow is not ACTIVE/published, ' +
+        'or this n8n instance has no such webhook. Current endpoint: ' + WEBHOOK_URL
+      );
+    }
+    if (!res.ok) {
+      throw new Error('Webhook responded with status ' + res.status + '. Check the n8n execution log for the failing node.');
+    }
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      throw new Error('Webhook returned a non-JSON response. Check the n8n Respond node output.');
+    }
+    if (!data || !Array.isArray(data.palette) || data.palette.length === 0) {
+      throw new Error(
+        'The workflow answered but returned an empty kit (no palette). ' +
+        'The AI likely returned invalid JSON or errored — inspect the Validate Kit / HTTP Request step of the latest n8n execution.'
+      );
+    }
+    lastResult = data;
+    renderResult(data, payload.version || 1);
+  } catch(err){
+    renderError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function setLoading(isLoading){
+  submitBtn.disabled = isLoading;
+  submitBtn.textContent = isLoading ? 'Generating… (up to ~3 min)' : 'Generate kit';
+  if(isLoading){
+    resultPanel.innerHTML = '<div class="spinner-note">— building specimen sheet —<br>this usually takes about two minutes</div>';
+  }
+}
+
+function renderError(message){
+  resultPanel.innerHTML = `
+    <div class="error-note">
+      <b>Generation failed</b>
+      ${escapeHtml(message)}
+    </div>
+    <div class="empty-state">
+      <span class="num">!</span>
+      <p>Nothing generated yet. Fix the connection above and generate again.</p>
+    </div>
+  `;
+}
+
+function renderResult(data, version){
+  const palette = data.palette || [];
+  const fonts = data.fonts || {heading:'Georgia', body:'Arial'};
+  const rationale = data.rationale || '';
+  const brandName = (lastBrief && lastBrief.brand_name) || 'Untitled brand';
+
+  const chips = palette.map(c => `
+    <div class="chip">
+      <div class="swatch" style="background:${escapeHtml(c.hex)}"></div>
+      <div class="role">${escapeHtml(c.role || '')}</div>
+      <div class="hex">${escapeHtml(c.hex)}</div>
+    </div>
+  `).join('');
+
+  resultPanel.innerHTML = `
+    <div class="sheet-header">
+      <h2>${escapeHtml(brandName)}</h2>
+      <span class="meta">Kit v${version}</span>
+    </div>
+
+    <div class="swatch-row">${chips}</div>
+
+    <div class="type-specimen">
+      <div class="label">Type pairing</div>
+      <div class="heading-sample" style="font-family:'${escapeHtml(fonts.heading)}', 'Fraunces', serif;">
+        ${escapeHtml(brandName)}
+      </div>
+      <div class="body-sample" style="font-family:'${escapeHtml(fonts.body)}', 'IBM Plex Sans', sans-serif;">
+        The quick brown fox jumps over the lazy dog — set here in the body face at a comfortable reading size, so you can judge it against real text rather than a lorem ipsum block.
+      </div>
+      <div class="font-names">
+        <span>Heading — <b>${escapeHtml(fonts.heading)}</b></span>
+        <span>Body — <b>${escapeHtml(fonts.body)}</b></span>
+      </div>
+    </div>
+
+    ${rationale ? `<div class="rationale">${escapeHtml(rationale)}</div>` : ''}
+
+    <div class="refine-bar">
+      <input type="text" id="refineInput" placeholder="Refine this kit — e.g. &quot;more playful&quot;, &quot;swap the accent&quot;, &quot;try a serif body&quot;">
+      <button type="button" id="refineBtn">Refine</button>
+    </div>
+    <div class="version-tag">Session ${sessionId} · this refine will build on v${version}</div>
+  `;
+
+  document.getElementById('refineBtn').addEventListener('click', async () => {
+    const instruction = document.getElementById('refineInput').value.trim();
+    if(!instruction) return;
+    const nextVersion = version + 1;
+    const payload = {
+      ...lastBrief,
+      version: nextVersion,
+      refine_instruction: instruction,
+      previous_result: lastResult
+    };
+    await generate(payload);
+  });
+}
+
+const N8N_BASE = WEBHOOK_URL.replace(/\/webhook\/.*$/, '/webhook/');
+const GALLERY_LIST_URL = new URLSearchParams(location.search).get('gallery') || (N8N_BASE + 'brand-kits');
+const GALLERY_DELETE_URL = N8N_BASE + 'brand-kits-delete';
+
+const tabOrder = document.getElementById('tabOrder');
+const tabHistory = document.getElementById('tabHistory');
+const orderView = document.getElementById('orderView');
+const historyView = document.getElementById('historyView');
+const galleryGrid = document.getElementById('galleryGrid');
+const historySearch = document.getElementById('historySearch');
+const mineOnly = document.getElementById('mineOnly');
+
+function showTab(which){
+  const isOrder = which === 'order';
+  tabOrder.classList.toggle('active', isOrder);
+  tabHistory.classList.toggle('active', !isOrder);
+  orderView.hidden = !isOrder;
+  historyView.hidden = isOrder;
+  if (!isOrder) loadGallery();
+}
+tabOrder.addEventListener('click', () => showTab('order'));
+tabHistory.addEventListener('click', () => showTab('history'));
+document.getElementById('refreshGallery').addEventListener('click', loadGallery);
+let searchTimer = null;
+historySearch.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(loadGallery, 350);
+});
+mineOnly.addEventListener('change', loadGallery);
+
+async function loadGallery(){
+  galleryGrid.innerHTML = '<div class="spinner-note">— loading kits —</div>';
+  const params = new URLSearchParams();
+  if (mineOnly.checked) params.set('session_id', sessionId);
+  const q = historySearch.value.trim();
+  if (q) params.set('search', q);
+  params.set('t', Date.now().toString());
+  try {
+    const res = await fetch(GALLERY_LIST_URL + '?' + params.toString());
+    if (res.status === 404) {
+      throw new Error('Gallery endpoint returned 404 — is the workflow published with the gallery branch? Endpoint: ' + GALLERY_LIST_URL);
+    }
+    if (!res.ok) throw new Error('Gallery responded with status ' + res.status);
+    const data = await res.json();
+    renderGallery(data.kits || []);
+  } catch (err) {
+    galleryGrid.innerHTML = `<div class="error-note"><b>Could not load history</b>${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function renderGallery(kits){
+  if (!kits.length) {
+    galleryGrid.innerHTML = '<div class="empty-state"><span class="num">00</span><p>No kits logged yet. Generate your first kit from the Order tab.</p></div>';
+    return;
+  }
+  galleryGrid.innerHTML = kits.map((kit, i) => {
+    const dots = (Array.isArray(kit.palette) ? kit.palette : []).map(c =>
+      `<span class="dot" style="background:${escapeHtml(c.hex || '#ccc')}" title="${escapeHtml((c.role || '') + ' ' + (c.hex || ''))}"></span>`
+    ).join('');
+    const own = kit.session_id && kit.session_id === sessionId;
+    const when = kit.created_at ? new Date(kit.created_at).toLocaleString() : '';
+    return `
+    <div class="kit-card">
+      <h3>${escapeHtml(kit.brand_name || 'Untitled')}</h3>
+      <span class="meta">v${escapeHtml(String(kit.version || 1))} · ${escapeHtml(when)}${own ? ' · yours' : ''}</span>
+      <div class="dots">${dots}</div>
+      <div class="fonts">${escapeHtml((kit.fonts && kit.fonts.heading) || '')} / ${escapeHtml((kit.fonts && kit.fonts.body) || '')}</div>
+      <div class="actions">
+        <button type="button" data-open="${i}">Open</button>
+        ${own ? `<button type="button" class="danger" data-del="${escapeHtml(kit.id || '')}">Delete</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  galleryGrid._kits = kits;
+  galleryGrid.querySelectorAll('[data-open]').forEach(btn => {
+    btn.addEventListener('click', () => openKit(galleryGrid._kits[Number(btn.dataset.open)]));
+  });
+  galleryGrid.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => deleteKit(btn.dataset.del));
+  });
+}
+
+function openKit(kit){
+  if (!kit) return;
+  lastBrief = {
+    brand_name: kit.brand_name || '',
+    industry: kit.industry || '',
+    mood: kit.mood || '',
+    avoid_colors: '',
+    logo_seed_colors: [],
+    refine_instruction: null,
+    session_id: sessionId,
+    version: (Number(kit.version) || 1) + 1
+  };
+  lastResult = {
+    palette: kit.palette,
+    fonts: kit.fonts,
+    rationale: kit.rationale,
+    meets_accessibility: kit.meets_accessibility
+  };
+  showTab('order');
+  renderResult(lastResult, lastBrief.version);
+}
+
+async function deleteKit(id){
+  if (!id) return;
+  if (!confirm('Delete this kit from history?')) return;
+  try {
+    const params = new URLSearchParams({ id, session_id: sessionId, t: Date.now().toString() });
+    const res = await fetch(GALLERY_DELETE_URL + '?' + params.toString());
+    if (!res.ok) throw new Error('Delete responded with status ' + res.status);
+    await loadGallery();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+</script>
+</body>
+</html>
