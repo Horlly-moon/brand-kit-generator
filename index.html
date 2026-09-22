@@ -402,6 +402,132 @@
     padding:40px 0;
     text-align:center;
   }
+
+  /* ---- Tabs + gallery ---- */
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:32px;
+  }
+  .tab{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    border-radius:var(--radius);
+    padding:9px 22px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .tab:hover{border-color:var(--accent); color:var(--ink);}
+  .tab.active{background:var(--ink); border-color:var(--ink); color:var(--paper);}
+  .history-bar{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .history-bar input[type=text]{
+    flex:1;
+    min-width:180px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:11px 12px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:13.5px;
+    color:var(--ink);
+  }
+  .history-bar input[type=text]:focus{outline:none; border-color:var(--accent);}
+  .mine-only{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .history-bar button{
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:11px 20px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .history-bar button:hover{background:var(--ink); color:var(--paper);}
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
+    gap:16px;
+  }
+  .kit-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .kit-card h3{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:18px;
+    margin:0;
+  }
+  .kit-card .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .kit-card .dots{display:flex; gap:6px;}
+  .kit-card .dots .dot{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    border:1px solid var(--line);
+  }
+  .kit-card .fonts{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .kit-card .actions{display:flex; gap:8px; margin-top:4px;}
+  .kit-card .actions button{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:8px 0;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .kit-card .actions button:hover{background:var(--ink); color:var(--paper);}
+  .kit-card .actions button.danger{border-color:#B34A3C; color:#B34A3C;}
+  .kit-card .actions button.danger:hover{background:#B34A3C; color:#fff;}
+  [data-theme="dark"] .kit-card .actions button.danger{border-color:#7A3A30; color:#E8AFA4;}
+  [data-theme="dark"] .kit-card .actions button.danger:hover{background:#7A3A30; color:#fff;}
 </style>
 </head>
 <body>
@@ -415,7 +541,12 @@
     </div>
   </header>
 
-  <div class="layout">
+  <nav class="tabs">
+    <button type="button" class="tab active" id="tabOrder">Order</button>
+    <button type="button" class="tab" id="tabHistory">History</button>
+  </nav>
+
+  <div class="layout" id="orderView">
 
     <!-- ORDER FORM -->
     <div class="form-card">
@@ -461,6 +592,15 @@
       </div>
     </div>
 
+  </div>
+
+  <div id="historyView" hidden>
+    <div class="history-bar">
+      <input type="text" id="historySearch" placeholder="Search brand…">
+      <label class="mine-only"><input type="checkbox" id="mineOnly" checked> Mine only</label>
+      <button type="button" id="refreshGallery">Refresh</button>
+    </div>
+    <div id="galleryGrid" class="gallery-grid"></div>
   </div>
 </div>
 
@@ -754,6 +894,123 @@ function renderResult(data, version){
     };
     await generate(payload);
   });
+}
+
+const N8N_BASE = WEBHOOK_URL.replace(/\/webhook\/.*$/, '/webhook/');
+const GALLERY_LIST_URL = new URLSearchParams(location.search).get('gallery') || (N8N_BASE + 'brand-kits');
+const GALLERY_DELETE_URL = N8N_BASE + 'brand-kits-delete';
+
+const tabOrder = document.getElementById('tabOrder');
+const tabHistory = document.getElementById('tabHistory');
+const orderView = document.getElementById('orderView');
+const historyView = document.getElementById('historyView');
+const galleryGrid = document.getElementById('galleryGrid');
+const historySearch = document.getElementById('historySearch');
+const mineOnly = document.getElementById('mineOnly');
+
+function showTab(which){
+  const isOrder = which === 'order';
+  tabOrder.classList.toggle('active', isOrder);
+  tabHistory.classList.toggle('active', !isOrder);
+  orderView.hidden = !isOrder;
+  historyView.hidden = isOrder;
+  if (!isOrder) loadGallery();
+}
+tabOrder.addEventListener('click', () => showTab('order'));
+tabHistory.addEventListener('click', () => showTab('history'));
+document.getElementById('refreshGallery').addEventListener('click', loadGallery);
+let searchTimer = null;
+historySearch.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(loadGallery, 350);
+});
+mineOnly.addEventListener('change', loadGallery);
+
+async function loadGallery(){
+  galleryGrid.innerHTML = '<div class="spinner-note">— loading kits —</div>';
+  const params = new URLSearchParams();
+  if (mineOnly.checked) params.set('session_id', sessionId);
+  const q = historySearch.value.trim();
+  if (q) params.set('search', q);
+  params.set('t', Date.now().toString());
+  try {
+    const res = await fetch(GALLERY_LIST_URL + '?' + params.toString());
+    if (res.status === 404) {
+      throw new Error('Gallery endpoint returned 404 — is the workflow published with the gallery branch? Endpoint: ' + GALLERY_LIST_URL);
+    }
+    if (!res.ok) throw new Error('Gallery responded with status ' + res.status);
+    const data = await res.json();
+    renderGallery(data.kits || []);
+  } catch (err) {
+    galleryGrid.innerHTML = `<div class="error-note"><b>Could not load history</b>${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function renderGallery(kits){
+  if (!kits.length) {
+    galleryGrid.innerHTML = '<div class="empty-state"><span class="num">00</span><p>No kits logged yet. Generate your first kit from the Order tab.</p></div>';
+    return;
+  }
+  galleryGrid.innerHTML = kits.map((kit, i) => {
+    const dots = (Array.isArray(kit.palette) ? kit.palette : []).map(c =>
+      `<span class="dot" style="background:${escapeHtml(c.hex || '#ccc')}" title="${escapeHtml((c.role || '') + ' ' + (c.hex || ''))}"></span>`
+    ).join('');
+    const own = kit.session_id && kit.session_id === sessionId;
+    const when = kit.created_at ? new Date(kit.created_at).toLocaleString() : '';
+    return `
+    <div class="kit-card">
+      <h3>${escapeHtml(kit.brand_name || 'Untitled')}</h3>
+      <span class="meta">v${escapeHtml(String(kit.version || 1))} · ${escapeHtml(when)}${own ? ' · yours' : ''}</span>
+      <div class="dots">${dots}</div>
+      <div class="fonts">${escapeHtml((kit.fonts && kit.fonts.heading) || '')} / ${escapeHtml((kit.fonts && kit.fonts.body) || '')}</div>
+      <div class="actions">
+        <button type="button" data-open="${i}">Open</button>
+        ${own ? `<button type="button" class="danger" data-del="${escapeHtml(kit.id || '')}">Delete</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  galleryGrid._kits = kits;
+  galleryGrid.querySelectorAll('[data-open]').forEach(btn => {
+    btn.addEventListener('click', () => openKit(galleryGrid._kits[Number(btn.dataset.open)]));
+  });
+  galleryGrid.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => deleteKit(btn.dataset.del));
+  });
+}
+
+function openKit(kit){
+  if (!kit) return;
+  lastBrief = {
+    brand_name: kit.brand_name || '',
+    industry: kit.industry || '',
+    mood: kit.mood || '',
+    avoid_colors: '',
+    logo_seed_colors: [],
+    refine_instruction: null,
+    session_id: sessionId,
+    version: (Number(kit.version) || 1) + 1
+  };
+  lastResult = {
+    palette: kit.palette,
+    fonts: kit.fonts,
+    rationale: kit.rationale,
+    meets_accessibility: kit.meets_accessibility
+  };
+  showTab('order');
+  renderResult(lastResult, lastBrief.version);
+}
+
+async function deleteKit(id){
+  if (!id) return;
+  if (!confirm('Delete this kit from history?')) return;
+  try {
+    const params = new URLSearchParams({ id, session_id: sessionId, t: Date.now().toString() });
+    const res = await fetch(GALLERY_DELETE_URL + '?' + params.toString());
+    if (!res.ok) throw new Error('Delete responded with status ' + res.status);
+    await loadGallery();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
 }
 
 function escapeHtml(str){
