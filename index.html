@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Specimen: brand kits, set like type</title>
+<title>Specimen: brief in, brand out</title>
 <meta name="description" content="Describe your brand. Get a palette, type pairing, and rationale in about two minutes. Real Google Fonts, accessibility-checked.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +43,7 @@
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
   }
-  .wrap{max-width:1180px; margin:0 auto; padding:0 28px 96px;}
+  .wrap{max-width:none; margin:0; padding:0 5vw 96px;}
 
   header.top{
     display:flex; justify-content:space-between; align-items:center;
@@ -85,11 +85,11 @@
   section.plate:last-of-type{border-bottom:none;}
 
   /* Hero */
-  .hero{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center; padding:64px 0 80px;}
-  @media (max-width:900px){.hero{grid-template-columns:1fr; gap:36px;}}
+  .hero{display:grid; grid-template-columns:1.05fr 0.95fr; gap:5vw; align-items:center; min-height:88vh; padding:48px 0 64px;}
+  @media (max-width:900px){.hero{grid-template-columns:1fr; gap:36px; min-height:0;}}
   .hero h1{
-    font-family:'Fraunces',serif; font-weight:500; font-size:clamp(46px, 6vw, 78px);
-    line-height:1.02; letter-spacing:-0.02em; margin:0 0 24px; text-align:left;
+    font-family:'Fraunces',serif; font-weight:500; font-size:clamp(52px, 7.5vw, 110px);
+    line-height:1.0; letter-spacing:-0.02em; margin:0 0 24px; text-align:left;
   }
   .hero h1 em{font-style:italic; color:var(--accent);}
   .hero p.lede{font-size:18.5px; line-height:1.7; color:var(--ink-soft); max-width:48ch; margin:0 0 32px;}
@@ -254,7 +254,7 @@
   <div class="hero">
     <div class="reveal in">
       <span class="eyebrow">A working specimen, not a mockup</span>
-      <h1>A brand kit, <em>set like type.</em></h1>
+      <h1>Brief in, <em>brand out.</em></h1>
       <p class="lede">Describe your brand. In about two minutes you get a palette with named roles, a heading and body type pairing, and a written rationale. Generated, accessibility checked, and ready to refine.</p>
       <div class="hero-cta">
         <a class="btn" href="app/">Create your first kit</a>
