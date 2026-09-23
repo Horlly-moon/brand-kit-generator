@@ -249,18 +249,13 @@
     color:transparent; -webkit-text-stroke:1px var(--line);
     opacity:.55; user-select:none; white-space:nowrap; will-change:transform;
   }
-  .ink-wash{position:fixed; left:0; top:0; z-index:-2; width:44vmax; height:44vmax; border-radius:50%;
-    filter:blur(90px); pointer-events:none; opacity:.16; will-change:transform;}
-  .ink-a{background:var(--accent); top:-10vmax; left:-10vmax;}
-  .ink-b{background:var(--sage); bottom:-14vmax; right:-12vmax; opacity:.12;}
   .grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
   [data-theme="dark"] .grain{opacity:.07;}
   .vignette{position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:0; transition:opacity .4s ease;
     background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.42) 100%);}
   [data-theme="dark"] .vignette{opacity:1;}
-  @media (hover:none){.ink-wash{display:none;}}
-  @media (prefers-reduced-motion: reduce){.glyph-field,.ink-wash,.grain{display:none;}}
+  @media (prefers-reduced-motion: reduce){.glyph-field,.grain{display:none;}}
 
   /* Folder reveal stage */
   .folder-scene{perspective:1200px; max-width:640px; margin:8px auto 0; text-align:center;}
@@ -331,8 +326,6 @@
 </head>
 <body>
 <div class="glyph-field" id="glyphField" aria-hidden="true"></div>
-<div class="ink-wash ink-a" id="inkA" aria-hidden="true"></div>
-<div class="ink-wash ink-b" id="inkB" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 <div class="wrap">
@@ -376,8 +369,7 @@
         <div class="folder-papers">
           <div class="folder-paper behind-2"></div>
           <div class="folder-paper behind-1"></div>
-          <div class="folder-paper" id="featuredKit"></div>
-        </div>
+          <div class="folder-paper" id="featuredKit"></div>        </div>
         <div class="folder-front"><span>SPECIMEN</span></div>
       </div>
       <div class="sample-actions">
@@ -572,6 +564,24 @@ function applyTheme(theme){
   themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
 }
 
+/* Reveals register first so content never gets stuck invisible. */
+function initReveals(){
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal:not(.in)').forEach((el) => observer.observe(el));
+}
+initReveals();
+
 const toTop = document.getElementById('toTop');
 window.addEventListener('scroll', () => {
   toTop.classList.toggle('show', window.scrollY > 600);
@@ -583,9 +593,10 @@ toTop.addEventListener('click', () => {
 /* Ambient background: glyph field + ink wash */
 const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia && window.matchMedia('(hover:hover)').matches;
+/* Ambient background: glyph field that drifts on scroll and parts around the cursor */
 (function glyphField(){
-  if (reduceMotion) return;
   const field = document.getElementById('glyphField');
+  if (!field || reduceMotion) return;
   const glyphs = ['Aa', 'Rr', 'Gg', '&', 'Ee', 'Qq', 'Kk', '?'];
   const layers = [];
   for (let i = 0; i < 14; i++) {
@@ -593,10 +604,11 @@ const finePointer = window.matchMedia && window.matchMedia('(hover:hover)').matc
     s.textContent = glyphs[i % glyphs.length];
     s.style.fontSize = (90 + Math.random() * 200) + 'px';
     s.style.left = (Math.random() * 90) + 'vw';
-    s.style.top = (Math.random() * 120) + '%';
-    s.style.transform = 'rotate(' + (Math.random() * 24 - 12) + 'deg)';
+    s.style.top = (Math.random() * 130) + '%';
+    const rot = Math.random() * 24 - 12;
+    s.style.transform = 'rotate(' + rot + 'deg)';
     field.appendChild(s);
-    layers.push({ el: s, depth: 0.04 + Math.random() * 0.12 });
+    layers.push({ el: s, depth: 0.04 + Math.random() * 0.12, rot: rot, ox: 0, oy: 0, tx: 0, ty: 0 });
   }
   let ticking = false;
   window.addEventListener('scroll', () => {
@@ -608,19 +620,36 @@ const finePointer = window.matchMedia && window.matchMedia('(hover:hover)').matc
       ticking = false;
     });
   }, { passive: true });
-})();
-(function inkWash(){
-  if (reduceMotion || !finePointer) return;
-  const a = document.getElementById('inkA'), b = document.getElementById('inkB');
-  let mx = window.innerWidth / 2, my = 240, ax = mx, ay = my, bx = mx, by = my;
-  window.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; }, { passive: true });
-  (function loop(){
-    ax += (mx - ax) * 0.06; ay += (my - ay) * 0.06;
-    bx += (mx - bx) * 0.028; by += (my - by) * 0.028;
-    a.style.transform = 'translate(' + ax + 'px,' + ay + 'px) translate(-50%,-50%)';
-    b.style.transform = 'translate(' + bx + 'px,' + by + 'px) translate(-50%,-50%)';
-    requestAnimationFrame(loop);
-  })();
+  if (!finePointer) return;
+  let raf = null;
+  const RADIUS = 220, PUSH = 80;
+  function frame(){
+    let moving = false;
+    layers.forEach((l) => {
+      l.ox += (l.tx - l.ox) * 0.12;
+      l.oy += (l.ty - l.oy) * 0.12;
+      if (Math.abs(l.tx - l.ox) > 0.4 || Math.abs(l.ty - l.oy) > 0.4) moving = true;
+      l.el.style.transform = 'rotate(' + l.rot + 'deg) translate(' + l.ox.toFixed(1) + 'px,' + l.oy.toFixed(1) + 'px)';
+    });
+    raf = moving ? requestAnimationFrame(frame) : null;
+  }
+  function kick(){ if (!raf) raf = requestAnimationFrame(frame); }
+  window.addEventListener('mousemove', (e) => {
+    layers.forEach((l) => {
+      const r = l.el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const dx = cx - e.clientX, dy = cy - e.clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      if (dist < RADIUS) {
+        const force = (RADIUS - dist) / RADIUS * PUSH;
+        l.tx = dx / dist * force;
+        l.ty = dy / dist * force;
+      } else {
+        l.tx = 0; l.ty = 0;
+      }
+    });
+    kick();
+  }, { passive: true });
 })();
 
 /* Sample stage: folder reveal + live reshuffler */
@@ -713,20 +742,6 @@ reshuffleBtn.addEventListener('click', async () => {
   }
 });
 
-const revealObserver = ('IntersectionObserver' in window)
-  ? new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 })
-  : null;
-document.querySelectorAll('.reveal:not(.in)').forEach((el) => {
-  if (revealObserver) { revealObserver.observe(el); }
-  else { el.classList.add('in'); }
-});
 </script>
 </body>
 </html>
