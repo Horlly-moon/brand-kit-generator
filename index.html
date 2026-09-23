@@ -1,973 +1,327 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Specimen Lab: brief in, brand out</title>
-<meta name="description" content="A working laboratory for brand kits. Calibrate, specimen, analyze, observe. Real Google Fonts, measured accessibility.">
+<title>Specimen Labs: every brand is a specimen</title>
+<meta name="description" content="A laboratory where brand identities are studied, extracted, and preserved. Descend through seven chambers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Baloo+2:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#101214; --paper-2:#181C1F; --ink:#EEEFEA; --ink-soft:#A7ACA6;
-    --accent:#F5A623; --sage:#8B9474; --line:#2A3034; --card:rgba(24,28,31,0.78);
-    --glow:rgba(245,166,35,0.14); --radius:2px; --pass:#7BC47F; --fail:#E5484D;
-  }
-  [data-theme="light"]{
-    --paper:#EEEFEA; --paper-2:#E4E5DE; --ink:#14171A; --ink-soft:#4B4F51;
-    --accent:#B97A12; --sage:#8B9474; --line:#C9CAC2; --card:rgba(251,250,247,0.84);
-    --glow:rgba(185,122,18,0.10); --pass:#2E7D32; --fail:#C62828;
+    --bg:#0B0D0C; --bg2:#111413; --ink:#E8E6DF; --ink-dim:#9A978C;
+    --brass:#B08D57; --cyan:#7FDCD0; --amber:#E8B84B;
+    --line:rgba(232,230,223,0.14); --panel:rgba(17,20,19,0.72);
   }
   *{box-sizing:border-box;}
-  [hidden]{display:none !important;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:auto;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--paper); color:var(--ink);
-    font-family:'IBM Plex Sans',sans-serif; font-size:16px; line-height:1.6;
-    -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden;
-    transition:background .3s ease, color .3s ease;
+    background:var(--bg); color:var(--ink);
+    font-family:'Zilla Slab',serif; font-size:17px; line-height:1.6;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
   }
-  #chamber{position:fixed; inset:0; z-index:0;}
-  #chamber canvas{display:block;}
-  .vignette{position:fixed; inset:0; z-index:1; pointer-events:none;
-    background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.52) 100%);}
-  [data-theme="light"] .vignette{background:radial-gradient(ellipse at center, transparent 62%, rgba(20,23,26,.14) 100%);}
-  .grain{position:fixed; inset:0; z-index:3; pointer-events:none; opacity:.07;
+  #world{position:fixed; inset:0; z-index:0;}
+  #world canvas{display:block;}
+  .grain{position:fixed; inset:0; z-index:5; pointer-events:none; opacity:.08;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
-  .wrap{max-width:none; margin:0; padding:0 5vw 90px; position:relative; z-index:2;}
+  .vignette{position:fixed; inset:0; z-index:4; pointer-events:none;
+    background:radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,.55) 100%);}
 
-  header.top{
+  /* Loader */
+  #loader{position:fixed; inset:0; z-index:100; background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity 1s ease;}
+  #loader.gone{opacity:0; pointer-events:none;}
+  .loader-inner{text-align:center;}
+  #loadWord{font-size:clamp(40px, 8vw, 96px); font-weight:600; letter-spacing:.04em; line-height:1;}
+  #loadWord em{font-style:italic; color:var(--brass);}
+  #loadPct{font-family:'Space Mono',monospace; font-size:13px; letter-spacing:.3em; color:var(--ink-dim); margin-top:20px;}
+  #loadSub{font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.26em; color:var(--cyan); margin-top:8px; text-transform:uppercase;}
+
+  /* HUD */
+  header.hud{
+    position:fixed; top:0; left:0; right:0; z-index:50;
     display:flex; justify-content:space-between; align-items:center;
-    padding:16px 5vw; gap:14px; flex-wrap:wrap;
-    position:sticky; top:0; z-index:50;
-    background:var(--paper); border-bottom:1px solid var(--line);
-    margin:0 -5vw;
+    padding:16px 4vw; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.14em;
+    background:linear-gradient(180deg, rgba(11,13,12,.85), transparent);
   }
-  .brandmark{font-family:'Fraunces',serif; font-weight:500; font-size:25px; letter-spacing:-0.01em; text-decoration:none; color:var(--ink);}
-  .brandmark span{font-style:italic; color:var(--accent);}
-  .brandmark small{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); letter-spacing:0.1em; margin-left:10px; vertical-align:middle;}
-  nav.main{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
-  nav.main a{
-    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase;
-    color:var(--ink-soft); text-decoration:none; padding:8px 6px; transition:color .15s ease;
-  }
-  nav.main a:hover{color:var(--ink);}
-  nav.main a .ch{color:var(--accent); margin-right:5px;}
-  nav.main .tc{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); letter-spacing:0.08em; display:flex; align-items:center; gap:7px;}
-  nav.main .tc i{width:8px; height:8px; border-radius:50%; background:#E5484D; animation:blink 1.6s infinite;}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+  header.hud a{color:var(--ink-dim); text-decoration:none; text-transform:uppercase;}
+  header.hud a:hover{color:var(--ink);}
+  .brandmark{font-family:'Zilla Slab',serif; font-size:20px; font-weight:600; letter-spacing:.02em; color:var(--ink); text-decoration:none;}
+  .brandmark span{font-style:italic; color:var(--brass);}
+  #chamberReadout{color:var(--cyan);}
+  #scrollbar{position:fixed; top:0; left:0; height:2px; width:100%; z-index:60; transform-origin:left; transform:scaleX(0); background:var(--brass);}
 
+  main{position:relative; z-index:2;}
+  .chapter{min-height:220vh; position:relative;}
+  .beat{
+    position:sticky; top:0; min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:0 8vw; max-width:1200px; pointer-events:none;
+  }
+  .beat > *{pointer-events:auto;}
+  .tag{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.22em;
+    color:var(--brass); text-transform:uppercase; margin-bottom:18px;
+    opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s ease;
+  }
+  .chapter.lit .tag{opacity:1; transform:none;}
+  h1.display, h2.display{
+    font-weight:600; letter-spacing:-0.01em; line-height:1.02; margin:0 0 22px;
+    opacity:0; transform:translateY(26px); transition:opacity .8s ease .1s, transform .8s ease .1s;
+  }
+  h1.display{font-size:clamp(48px, 7.5vw, 110px); max-width:12ch;}
+  h2.display{font-size:clamp(34px, 4.5vw, 62px); max-width:16ch;}
+  h1.display em, h2.display em{font-style:italic; color:var(--brass);}
+  .chapter.lit h1.display, .chapter.lit h2.display{opacity:1; transform:none;}
+  .lede{font-size:18.5px; line-height:1.7; color:var(--ink-dim); max-width:52ch; margin:0 0 30px;
+    opacity:0; transform:translateY(18px); transition:opacity .8s ease .25s, transform .8s ease .25s;}
+  .chapter.lit .lede{opacity:1; transform:none;}
+  .lede b{color:var(--ink);}
+  .spec-row{
+    display:flex; gap:26px; flex-wrap:wrap; font-family:'Space Mono',monospace;
+    font-size:11.5px; letter-spacing:.08em; color:var(--ink-dim);
+    opacity:0; transform:translateY(14px); transition:opacity .8s ease .4s, transform .8s ease .4s;
+  }
+  .chapter.lit .spec-row{opacity:1; transform:none;}
+  .spec-row b{color:var(--cyan); font-weight:400;}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;
+    opacity:0; transform:translateY(14px); transition:opacity .8s ease .5s, transform .8s ease .5s;}
+  .chapter.lit .cta-row{opacity:1; transform:none;}
   .btn{
-    display:inline-block; background:var(--accent); color:#14171A;
-    border:1px solid var(--accent); border-radius:var(--radius);
-    padding:14px 28px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500;
-    letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; cursor:pointer;
-    transition:transform .2s ease, box-shadow .2s ease; will-change:transform;
+    display:inline-block; background:var(--brass); color:#0B0D0C;
+    border:1px solid var(--brass); border-radius:2px; padding:15px 30px;
+    font-family:'Space Mono',monospace; font-size:12px; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; text-decoration:none; cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
   }
-  .btn:hover{box-shadow:0 8px 28px var(--glow);}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 8px 30px rgba(176,141,87,.35);}
   .btn.ghost{background:transparent; color:var(--ink); border-color:var(--line);}
-  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); box-shadow:none;}
-  .theme-toggle{
-    background:transparent; border:1px solid var(--line); color:var(--ink-soft);
-    border-radius:var(--radius); padding:8px 14px;
-    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em;
-    text-transform:uppercase; cursor:pointer; white-space:nowrap;
-    transition:border-color .15s ease, color .15s ease;
+  .btn.ghost:hover{border-color:var(--brass); color:var(--brass); box-shadow:none;}
+
+  .kitline{font-family:'Space Mono',monospace; font-size:12.5px; color:var(--ink-dim); line-height:2.1; margin-top:26px;
+    opacity:0; transition:opacity .8s ease .55s;}
+  .chapter.lit .kitline{opacity:1;}
+  .kitline b{color:var(--ink); font-weight:400;}
+  .kitline .sw{display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:7px; vertical-align:baseline; border:1px solid rgba(255,255,255,.25);}
+
+  body.fast h1.display, body.fast h2.display{
+    text-shadow:-2px 0 0 rgba(127,220,208,.55), 2px 0 0 rgba(232,184,75,.55);
   }
-  .theme-toggle:hover{border-color:var(--accent); color:var(--ink);}
 
-  /* Index rail */
-  .rail{position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:6px;}
-  .rail a{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
-    text-decoration:none; letter-spacing:0.06em; background:var(--paper-2);
-    border:1px solid var(--line); border-right:none; border-radius:4px 0 0 4px;
-    padding:10px 8px 10px 12px; opacity:0.65;
-    transition:opacity .2s ease, color .2s ease, padding .2s ease, background .2s ease;
-    display:flex; align-items:center; gap:8px;
-  }
-  .rail a:hover{opacity:1;}
-  .rail a.active{opacity:1; color:var(--accent); background:var(--card); padding-left:20px;}
-  .rail a b{font-weight:500;}
-  .rail .folio{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); letter-spacing:0.08em; text-align:right; padding:8px 12px 0 0; opacity:0.7;}
-  @media (max-width:1100px){.rail{display:none;}}
+  footer.end{position:relative; z-index:2; padding:30px 8vw 40px; display:flex; justify-content:space-between;
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.1em; color:var(--ink-dim); flex-wrap:wrap; gap:10px;}
+  footer.end a{color:var(--ink-dim); text-decoration:none;}
+  footer.end a:hover{color:var(--ink);}
 
-  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:16px;}
-  section.chapter{padding:130px 0; max-width:1240px; position:relative;}
-  section.chapter + section.chapter{border-top:1px dashed var(--line);}
-  h2.ch-title{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(32px, 4vw, 48px); margin:0 0 16px; letter-spacing:-0.01em;}
-  h2.ch-title .no{font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--ink-soft); vertical-align:super; letter-spacing:0.1em; margin-right:12px;}
-  p.ch-sub{color:var(--ink-soft); font-size:17px; line-height:1.7; max-width:64ch; margin:0 0 40px;}
-  .folio-line{display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:14px;}
-  .folio-line .pg{color:var(--accent);}
-  .page-nav{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:48px; padding-top:20px; border-top:1px solid var(--line);}
-  .page-nav a{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); text-decoration:none; transition:color .15s ease;}
-  .page-nav a:hover{color:var(--accent);}
-  .page-nav a .ch{color:var(--accent); margin:0 6px;}
-
-  .card{background:var(--card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--line); border-radius:var(--radius);}
-  [data-split] .ch{display:inline-block; cursor:default;}
-
-  /* Hero / calibrate */
-  .hero{min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:40px 0 64px; max-width:1240px;}
-  .hero h1{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(56px, 8.5vw, 124px); line-height:0.98; letter-spacing:-0.025em; margin:0 0 26px; text-wrap:balance; max-width:11ch; text-shadow:0 4px 40px rgba(0,0,0,0.45);}
-  .hero h1 em{font-style:italic; color:var(--accent);}
-  .hero p.lede{font-size:19px; line-height:1.7; color:var(--ink-soft); max-width:52ch; margin:0 0 34px; text-shadow:0 2px 18px rgba(0,0,0,0.5);}
-  .hero p.lede b{color:var(--ink);}
-  .hero-cta{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:34px;}
-  .hero-stats{display:flex; gap:36px; flex-wrap:wrap;}
-  .stat .v{font-family:'Fraunces',serif; font-size:34px; font-weight:500;}
-  .stat .v small{font-size:18px; color:var(--accent);}
-  .stat .k{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-soft);}
-
-  /* Folder / specimen drawer */
-  .folder-scene{perspective:1200px; max-width:640px; margin:8px 0 0;}
-  .folder{position:relative; height:380px; transform-style:preserve-3d;}
-  .folder-back{position:absolute; left:6%; right:6%; top:60px; bottom:0; background:var(--paper-2); border:1px solid var(--line); border-radius:6px 6px 4px 4px;}
-  .folder-tab{position:absolute; left:6%; top:34px; width:34%; height:30px; background:var(--paper-2); border:1px solid var(--line); border-bottom:none; border-radius:6px 10px 0 0;}
-  .folder-papers{position:absolute; inset:0; transform-style:preserve-3d;}
-  .folder-paper{
-    position:absolute; left:11%; right:11%; top:74px; background:var(--card);
-    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-    border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; text-align:left;
-    opacity:0; transform:translateY(120px) rotate(-1.5deg);
-    transition:opacity .7s ease, transform .8s cubic-bezier(.2,.9,.25,1.15);
-    box-shadow:0 14px 30px rgba(0,0,0,0.35);
-  }
-  .folder-paper.behind-1{transform:translateY(120px) rotate(2deg);}
-  .folder-paper.behind-2{transform:translateY(120px) rotate(-3.5deg);}
-  .folder.open .folder-paper{opacity:1; transform:translateY(-64px) rotate(-1.5deg);}
-  .folder.open .folder-paper.behind-1{transform:translateY(-34px) rotate(2deg); transition-delay:.12s;}
-  .folder.open .folder-paper.behind-2{transform:translateY(-8px) rotate(-3.5deg); transition-delay:.22s;}
-  .folder-paper h3{font-family:'Fraunces',serif; font-weight:500; font-size:24px; margin:0 0 10px;}
-  .folder-paper .dots{display:flex; gap:7px; margin-bottom:10px;}
-  .folder-paper .dots .dot{width:30px; height:30px; border-radius:50%; border:1px solid var(--line); cursor:pointer; transition:transform .2s ease;}
-  .folder-paper .dots .dot:hover{transform:scale(1.2);}
-  .folder-paper .tl{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);}
-  .folder-paper .tl b{color:var(--ink); font-weight:500;}
-  .folder-front{
-    position:absolute; left:6%; right:6%; top:60px; bottom:0;
-    background:linear-gradient(180deg, var(--card), var(--paper-2));
-    border:1px solid var(--line); border-radius:6px 6px 4px 4px;
-    transform-origin:50% 100%; transition:transform .9s cubic-bezier(.6,0,.3,1);
-    display:flex; align-items:flex-end; justify-content:center; padding-bottom:26px;
-  }
-  .folder-front span{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.3em; color:var(--ink-soft);}
-  .folder.open .folder-front{transform:rotateX(-72deg);}
-  .sample-actions{margin-top:26px; display:flex; gap:12px; flex-wrap:wrap;}
-  .sample-meta{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:14px; min-height:20px;}
-  @media (max-width:600px){.folder{height:420px;}}
-
-  /* Specimen sheet */
-  .specimen{padding:40px; display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px;}
-  @media (max-width:760px){.specimen{grid-template-columns:1fr; padding:28px;}}
-  .specimen .label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin-bottom:12px;}
-  .specimen .glyphs{font-size:32px; line-height:1.4; word-break:break-all;}
-  .specimen .nums{font-size:28px; line-height:1.55;}
-  .weights div{border-bottom:1px solid var(--line); padding:10px 0; font-size:26px;}
-  .weights div:last-child{border-bottom:none;}
-  .weights .w-light{font-weight:300;} .weights .w-regular{font-weight:400;} .weights .w-bold{font-weight:700;}
-
-  /* Lab: tokens + contrast bench */
-  .lab-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:1000px;}
-  @media (max-width:860px){.lab-grid{grid-template-columns:1fr;}}
-  .token-col h4{
-    font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase;
-    letter-spacing:0.1em; color:var(--accent); margin:0 0 18px; font-weight:500;
-  }
-  .token{display:flex; align-items:center; gap:14px; margin-bottom:14px; padding:10px 12px; border:1px solid transparent; border-radius:var(--radius); transition:border-color .2s ease, background .2s ease; cursor:default;}
-  .token:hover{border-color:var(--accent); background:var(--glow);}
-  .token .sw{width:48px; height:48px; border:1px solid var(--line); border-radius:var(--radius); flex:none;}
-  .token .t-role{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; color:var(--ink-soft); letter-spacing:0.06em;}
-  .token .t-hex{font-family:'IBM Plex Mono',monospace; font-size:14px;}
-  .token .t-lum{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); margin-left:auto; text-align:right;}
-  .bench{padding:28px;}
-  .bench h4{font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin:0 0 6px; font-weight:500;}
-  .bench p.cap{font-size:14px; color:var(--ink-soft); margin:0 0 18px;}
-  .cl-stage{border:1px solid var(--line); border-radius:var(--radius); padding:30px 20px; text-align:center; margin-bottom:18px; transition:background .2s ease;}
-  .cl-stage .big{font-size:64px; font-weight:600; line-height:1; transition:color .15s ease;}
-  .cl-stage .hexline{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); margin-top:10px;}
-  .bench input[type=range]{width:100%; accent-color:var(--accent); cursor:pointer;}
-  .cl-read{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
-  .cl-ratio{font-family:'Fraunces',serif; font-size:34px; font-weight:500;}
-  .cl-ratio small{font-size:17px; color:var(--ink-soft);}
-  .stamp{display:inline-block; border:2px solid var(--pass); color:var(--pass);
-    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:500;
-    letter-spacing:0.12em; text-transform:uppercase; padding:8px 16px; border-radius:3px;
-    transform:rotate(-4deg); transition:all .2s ease;}
-  .stamp.fail{border-color:var(--fail); color:var(--fail);}
-  .bar{height:8px; border:1px solid var(--line); border-radius:4px; margin-top:14px; overflow:hidden;}
-  .bar i{display:block; height:100%; width:0; background:var(--accent); transition:width .15s ease;}
-
-  /* Sheets */
-  .sheets{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;}
-  @media (max-width:900px){.sheets{grid-template-columns:1fr;}}
-  .sheet{padding:24px; transition:transform .25s ease, border-color .25s ease;}
-  .sheet:hover{transform:translateY(-5px); border-color:var(--accent);}
-  .sheet .frame{display:flex; gap:7px; margin-bottom:14px;}
-  .sheet .frame .dot{width:34px; height:34px; border-radius:50%; border:1px solid var(--line); transform:scale(.3); opacity:0; transition:transform .45s cubic-bezier(.2,.9,.3,1.4), opacity .3s ease; cursor:pointer;}
-  .sheet.in .frame .dot{transform:none; opacity:1;}
-  .sheet.in .frame .dot:nth-child(2){transition-delay:.07s;}
-  .sheet.in .frame .dot:nth-child(3){transition-delay:.14s;}
-  .sheet.in .frame .dot:nth-child(4){transition-delay:.21s;}
-  .sheet.in .frame .dot:nth-child(5){transition-delay:.28s;}
-  .sheet h3{font-family:'Fraunces',serif; font-weight:500; font-size:24px; margin:0 0 4px;}
-  .sheet .ind{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-bottom:12px;}
-  .sheet .data{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); line-height:2; border-top:1px solid var(--line); padding-top:12px;}
-  .sheet .data b{color:var(--accent); font-weight:500;}
-  .sheet p{font-size:14.5px; line-height:1.7; color:var(--ink-soft); margin:12px 0 0;}
-  .sheet .ind, .sheet h3{opacity:0; transform:translateY(8px); transition:opacity .45s ease .1s, transform .45s ease .1s;}
-  .sheet.in .ind, .sheet.in h3{opacity:1; transform:none;}
-  .sheet .data, .sheet p{opacity:0; transform:translateY(10px); transition:opacity .5s ease .5s, transform .5s ease .5s;}
-  .sheet .data, .sheet p{transition-delay:.55s;}
-  .sheet.in .data, .sheet.in p{opacity:1; transform:none;}
-
-  /* Steps */
-  .steps{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:1000px;}
-  @media (max-width:760px){.steps{grid-template-columns:1fr;}}
-  .step{padding:32px 28px; transition:transform .25s ease, border-color .25s ease;}
-  .step:hover{transform:translateY(-5px); border-color:var(--accent);}
-  .step .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent); letter-spacing:0.12em; display:block; margin-bottom:14px;}
-  .step h3{font-family:'Fraunces',serif; font-weight:500; font-size:23px; margin:0 0 12px;}
-  .step p{font-size:15px; line-height:1.7; color:var(--ink-soft); margin:0;}
-
-  /* CTA */
-  .cta-block{margin-top:88px; padding:72px 56px; max-width:1000px; position:relative; overflow:hidden;}
-  @media (max-width:600px){.cta-block{padding:52px 28px;}}
-  .cta-block::before{content:''; position:absolute; inset:0; background:radial-gradient(600px 220px at 20% 0%, var(--glow), transparent 70%); pointer-events:none;}
-  .cta-block h2{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(34px, 4.5vw, 54px); margin:0 0 16px; position:relative;}
-  .cta-block h2 em{font-style:italic; color:var(--accent);}
-  .cta-block p{font-size:16.5px; color:var(--ink-soft); margin:0 0 30px; max-width:52ch; position:relative;}
-  .cta-block .fine{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin:32px 0 0; position:relative;}
-  .cta-block .fine a{color:inherit;}
-
-  footer.site{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; max-width:1240px; padding:28px 0 8px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
-  footer.site a{color:var(--ink-soft); text-decoration:none;}
-  footer.site a:hover{color:var(--ink);}
-
-  #inspectBar{
-    position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(80px); z-index:55;
-    background:var(--card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-    border:1px solid var(--accent); border-radius:var(--radius);
-    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.04em; color:var(--ink);
-    padding:10px 18px; opacity:0; transition:opacity .25s ease, transform .25s ease;
-    pointer-events:none; white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis;
-  }
-  #inspectBar.show{opacity:1; transform:translateX(-50%) translateY(0);}
-  #inspectBar b{color:var(--accent); font-weight:500;}
-
-  .reveal{opacity:0; transform:translateY(22px); transition:opacity .65s ease, transform .65s ease;}
-  .reveal.in{opacity:1; transform:none;}
-  .reveal[data-delay="1"]{transition-delay:.1s;}
-  .reveal[data-delay="2"]{transition-delay:.2s;}
-  .reveal[data-delay="3"]{transition-delay:.3s;}
-  .rule{height:1px; background:var(--line); transform:scaleX(0); transform-origin:left; transition:transform 1s ease;}
-  .rule.in{transform:none;}
   #toTop{
-    position:fixed; right:28px; bottom:28px; z-index:60;
-    width:48px; height:48px; border-radius:50%;
-    background:var(--ink); color:var(--paper); border:1px solid var(--ink);
-    font-size:20px; line-height:1; cursor:pointer;
-    opacity:0; transform:translateY(12px); pointer-events:none;
-    transition:opacity .25s ease, transform .25s ease;
+    position:fixed; right:26px; bottom:26px; z-index:60; width:46px; height:46px; border-radius:50%;
+    background:transparent; color:var(--ink); border:1px solid var(--line);
+    font-size:19px; cursor:pointer; opacity:0; transform:translateY(12px); pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease, border-color .2s ease;
   }
   #toTop.show{opacity:1; transform:none; pointer-events:auto;}
-  .dogear{position:relative;}
-  .dogear::after{
-    content:''; position:absolute; top:-1px; right:-1px; width:26px; height:26px;
-    background:linear-gradient(to bottom left, var(--paper) 0 49%, var(--line) 50%, var(--card) 51% 100%);
-    border-radius:0 var(--radius) 0 4px; transition:width .25s ease, height .25s ease;
-  }
-  .dogear:hover::after{width:34px; height:34px;}
-  /* Intro + frost wash */
-  #intro{position:fixed; inset:0; z-index:100; background:var(--paper);
-    display:flex; align-items:center; justify-content:center;
-    transition:opacity .9s ease; cursor:pointer;}
-  #intro.gone{opacity:0; pointer-events:none;}
-  .intro-inner{text-align:center; padding:0 24px;}
-  #introWord{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(52px, 10vw, 132px); letter-spacing:.02em; line-height:1;}
-  #introWord em{font-style:italic; color:var(--accent);}
-  #introPct{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-soft); letter-spacing:.24em; margin-top:22px;}
-  .intro-sub{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.24em; color:var(--sage); margin-top:8px; text-transform:uppercase;}
-  .intro-skip{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.2em; color:var(--ink-soft); margin-top:26px; text-transform:uppercase; opacity:.6;}
-  #frost{position:fixed; inset:0; z-index:45; pointer-events:none; opacity:0; transition:opacity .8s ease;
-    background:radial-gradient(ellipse at center, rgba(200,210,218,.85) 0%, rgba(200,210,218,.25) 45%, transparent 75%);}
-  #frost.wash{opacity:.55; transition:opacity .1s ease;}
+  #toTop:hover{border-color:var(--brass); color:var(--brass);}
+
+  body.reduced #world{display:none;}
+  body.reduced{background:radial-gradient(1000px 500px at 50% 0%, #151918, #0B0D0C);}
   @media (prefers-reduced-motion: reduce){
-    html{scroll-behavior:auto;}
-    .reveal,.rule{opacity:1; transform:none; transition:none;}
-    .sheet .frame .dot,.sheet .ind,.sheet h3,.sheet .data,.sheet p{opacity:1; transform:none; transition:none;}
-    .folder-paper{opacity:1; transform:none !important; transition:none;}
-    .folder-front{transform:none !important; transition:none;}
-    *{transition:none !important;}
+    .tag,.lede,.spec-row,.cta-row,.kitline,h1.display,h2.display{opacity:1 !important; transform:none !important; transition:none !important;}
+  }
+  @media (max-width:640px){
+    h1.display{font-size:clamp(40px, 12vw, 64px);}
+    .beat{padding:0 6vw;}
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
 </script>
 </head>
 <body>
-<div id="intro" title="Click to skip">
-  <div class="intro-inner">
-    <div id="introWord">SPECIMEN</div>
-    <div id="introPct">00</div>
-    <div class="intro-sub" id="introSub">CALIBRATING INSTRUMENTS</div>
-    <div class="intro-skip">Click anywhere to skip</div>
+
+<div id="loader" title="Click to skip">
+  <div class="loader-inner">
+    <div id="loadWord">SPECIMEN</div>
+    <div id="loadPct">00</div>
+    <div id="loadSub">CALIBRATING INSTRUMENTS</div>
   </div>
 </div>
-<div id="frost" aria-hidden="true"></div>
-<div id="chamber" aria-hidden="true"></div>
+
+<div id="world" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
+<div id="scrollbar" aria-hidden="true"></div>
 
-<nav class="rail" aria-label="Index">
-  <a href="#brief" data-ch="brief"><b>01</b>Calibrate</a>
-  <a href="#sample" data-ch="sample"><b>02</b>Specimen</a>
-  <a href="#analyze" data-ch="analyze"><b>03</b>Analyze</a>
-  <a href="#kits" data-ch="kits"><b>04</b>Observe</a>
-  <a href="#begin" data-ch="begin"><b>05</b>Result</a>
-  <span class="folio" id="folioNow">p.01 / 05</span>
-</nav>
+<header class="hud">
+  <a class="brandmark" href="#ch1">Specimen <span>Labs</span></a>
+  <span id="chamberReadout">CH.01 / THRESHOLD</span>
+  <span><a href="/app/">Enter app</a></span>
+</header>
 
-<div class="wrap">
-
-  <header class="top">
-    <a class="brandmark" href="#brief">Specimen<span>.</span><small>LAB 01</small></a>
-    <nav class="main">
-      <span class="tc"><i></i><span id="timecode">00:00:00</span></span>
-      <a href="#analyze"><span class="ch">03</span>Analyze</a>
-      <a href="#kits"><span class="ch">04</span>Observe</a>
-      <a href="app/">Open the app</a>
-      <a href="#" title="Accounts are coming soon">Sign in</a>
-      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Light</button>
-    </nav>
-  </header>
-
-  <!-- 01 CALIBRATE -->
-  <div class="hero" id="brief">
-    <div>
-      <div class="folio-line"><span>Experiment 01, Calibrate</span><span class="pg">p.01 / 05</span></div>
-      <span class="eyebrow">The lab is warm, instruments nominal</span>
-      <h1 data-split>Brief in, <em>brand out.</em></h1>
-      <p class="lede">State your <b>brief</b> like a hypothesis. In about two minutes the lab returns a palette with named roles, a heading and body type pairing, and a written rationale. Every reading below is <b>measured, not claimed</b>. Drag the specimen word behind you. Touch the headlines, they jump.</p>
-      <div class="hero-cta">
-        <a class="btn magnetic" href="app/">Run experiment 01</a>
-        <a class="btn ghost magnetic" href="#sample">Inspect a specimen</a>
-      </div>
-      <div class="hero-stats">
-        <div class="stat"><div class="v"><span data-count="13.9" data-dec="1">0</span><small>:1</small></div><div class="k">Contrast, computed</div></div>
-        <div class="stat"><div class="v"><span data-count="2000" data-plus="1">0</span><small>+</small></div><div class="k">Live Google Fonts</div></div>
-        <div class="stat"><div class="v"><span data-count="2">0</span><small>min</small></div><div class="k">Per assay</div></div>
-      </div>
-    </div>
-    <div class="page-nav" style="max-width:1240px;"><span></span><a href="#sample">Next <span class="ch">02</span> Specimen &rarr;</a></div>
-  </div>
-
-  <!-- 02 SPECIMEN -->
-  <section class="chapter reveal" id="sample">
-    <div class="folio-line"><span>Experiment 02, Specimen</span><span class="pg">p.02 / 05</span></div>
-    <span class="eyebrow">Fresh from the logbook</span>
-    <h2 class="ch-title" data-split><span class="no">02</span>Open a specimen.</h2>
-    <p class="ch-sub">Every sample is a real generation. Hover the dots to assay each part. Generate another straight from the log.</p>
-    <div class="folder-scene" style="margin:8px 0 0;">
-      <div class="folder" id="folder">
-        <div class="folder-tab"></div>
-        <div class="folder-back"></div>
-        <div class="folder-papers">
-          <div class="folder-paper behind-2"></div>
-          <div class="folder-paper behind-1"></div>
-          <div class="folder-paper" id="featuredKit"></div>
-        </div>
-        <div class="folder-front"><span>SPECIMEN</span></div>
-      </div>
-      <div class="sample-actions">
-        <button type="button" class="btn magnetic" id="reshuffleBtn">Assay another</button>
-      </div>
-      <p class="sample-meta" id="sampleMeta"></p>
-    </div>
-    <div class="page-nav" style="max-width:1240px;"><a href="#brief">&larr; Prev <span class="ch">01</span> Calibrate</a><a href="#analyze">Next <span class="ch">03</span> Analyze &rarr;</a></div>
-  </section>
-
-  <!-- 03 ANALYZE -->
-  <section class="chapter reveal" id="analyze">
-    <div class="folio-line"><span>Experiment 03, Analyze</span><span class="pg">p.03 / 05</span></div>
-    <span class="eyebrow">The bench</span>
-    <h2 class="ch-title" data-split><span class="no">03</span>Measure everything.</h2>
-    <p class="ch-sub">One TestCo kit under the lens. Hover any token for its luminance reading. Then work the contrast bench yourself: drag the slider until the stamp flips.</p>
-    <div class="rule" data-rule></div>
-    <div class="lab-grid" style="margin-top:36px;">
-      <div>
-        <div class="token-col">
-          <h4>Color tokens, TestCo</h4>
-          <div class="token" data-hex="#1D4ED8" data-role="Primary" data-lum="0.088"><span class="sw" style="background:#1D4ED8"></span><span><span class="t-role">Primary</span><br><span class="t-hex">#1D4ED8</span></span><span class="t-lum">L 0.088</span></div>
-          <div class="token" data-hex="#0EA5E9" data-role="Secondary" data-lum="0.312"><span class="sw" style="background:#0EA5E9"></span><span><span class="t-role">Secondary</span><br><span class="t-hex">#0EA5E9</span></span><span class="t-lum">L 0.312</span></div>
-          <div class="token" data-hex="#F59E0B" data-role="Accent" data-lum="0.382"><span class="sw" style="background:#F59E0B"></span><span><span class="t-role">Accent</span><br><span class="t-hex">#F59E0B</span></span><span class="t-lum">L 0.382</span></div>
-          <div class="token" data-hex="#F8FAFC" data-role="Background" data-lum="0.945"><span class="sw" style="background:#F8FAFC"></span><span><span class="t-role">Background</span><br><span class="t-hex">#F8FAFC</span></span><span class="t-lum">L 0.945</span></div>
-          <div class="token" data-hex="#1E293B" data-role="Neutral / Text" data-lum="0.024"><span class="sw" style="background:#1E293B"></span><span><span class="t-role">Neutral / Text</span><br><span class="t-hex">#1E293B</span></span><span class="t-lum">L 0.024</span></div>
-        </div>
-      </div>
-      <div class="bench card dogear">
-        <h4>Contrast bench, live assay</h4>
-        <p class="cap">Slide the text tone. The ratio is computed per WCAG against #F8FAFC. Floor: 4.5:1.</p>
-        <div class="cl-stage" id="clStage" style="background:#F8FAFC;">
-          <div class="cl-big" id="clText" style="color:#1E293B;">Aa</div>
-          <div class="hexline" id="clHex">#1E293B · L 0.024</div>
-        </div>
-        <input type="range" id="clRange" min="4" max="98" value="12" aria-label="Text lightness">
-        <div class="cl-read">
-          <span class="cl-ratio"><span id="clRatio">–</span><small>:1</small></span>
-          <span class="stamp" id="clStamp">…</span>
-        </div>
-        <div class="bar"><i id="clBar"></i></div>
-      </div>
-    </div>
-    <div class="page-nav" style="max-width:1240px;"><a href="#sample">&larr; Prev <span class="ch">02</span> Specimen</a><a href="#kits">Next <span class="ch">04</span> Observe &rarr;</a></div>
-  </section>
-
-  <!-- 04 OBSERVE -->
-  <section class="chapter reveal" id="kits">
-    <div class="folio-line"><span>Experiment 04, Observe</span><span class="pg">p.04 / 05</span></div>
-    <span class="eyebrow">From the logbook</span>
-    <h2 class="ch-title" data-split><span class="no">04</span>Contact sheets, real briefs.</h2>
-    <p class="ch-sub">Pulled from actual generations across food, fintech, and logistics. Hover any dot to assay it. Kits you make land in History, ready to reopen.</p>
-    <div class="rule" data-rule></div>
-    <div class="sheets" style="margin-top:36px;">
-      <div class="sheet card dogear reveal" data-delay="1">
-        <div class="frame">
-          <span class="dot" style="background:#E63946"></span>
-          <span class="dot" style="background:#F1FA8C"></span>
-          <span class="dot" style="background:#FFB703"></span>
-          <span class="dot" style="background:#FFF9F0"></span>
-          <span class="dot" style="background:#3A2E2A"></span>
-        </div>
-        <h3 style="font-family:'Baloo 2',sans-serif;">SeedCo</h3>
-        <div class="ind">Food · v1 · Baloo 2 / Nunito Sans</div>
-        <div class="data">CONTRAST <b>12.5:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b></div>
-        <p>Seed logo colors lead as primary and secondary, with a golden accent for appetite appeal on cream.</p>
-      </div>
-      <div class="sheet card dogear reveal" data-delay="2">
-        <div class="frame">
-          <span class="dot" style="background:#1D4ED8"></span>
-          <span class="dot" style="background:#0EA5E9"></span>
-          <span class="dot" style="background:#F59E0B"></span>
-          <span class="dot" style="background:#F8FAFC"></span>
-          <span class="dot" style="background:#1E293B"></span>
-        </div>
-        <h3 style="font-family:'Oswald',sans-serif;">TestCo</h3>
-        <div class="ind">Fintech · v1 · Oswald / Inter</div>
-        <div class="data">CONTRAST <b>13.9:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b></div>
-        <p>Deep blue trust base with an amber energy accent. Red was explicitly avoided per the brief.</p>
-      </div>
-      <div class="sheet card dogear reveal" data-delay="3">
-        <div class="frame">
-          <span class="dot" style="background:#1A3A5C"></span>
-          <span class="dot" style="background:#2E86AB"></span>
-          <span class="dot" style="background:#27AE60"></span>
-          <span class="dot" style="background:#F8FAFC"></span>
-          <span class="dot" style="background:#212529"></span>
-        </div>
-        <h3 style="font-family:'Fraunces',serif;">SupabaseCheck</h3>
-        <div class="ind">Logistics · v1 · Fraunces / Inter</div>
-        <div class="data">CONTRAST <b>13.9:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b></div>
-        <p>Navy stability with a growth green accent. Tradition set against forward motion.</p>
-      </div>
-    </div>
-    <div class="page-nav" style="max-width:1240px;"><a href="#analyze">&larr; Prev <span class="ch">03</span> Analyze</a><a href="#begin">Next <span class="ch">05</span> Result &rarr;</a></div>
-  </section>
-
-  <!-- PROCEDURE -->
-  <section class="chapter reveal" id="how">
-    <span class="eyebrow">Procedure</span>
-    <h2 class="ch-title" data-split>Describe. Generate. Refine.</h2>
-    <p class="ch-sub">Three steps, one continuous loop. Every iteration is versioned and logged to your history.</p>
-    <div class="rule" data-rule></div>
-    <div class="steps" style="margin-top:36px;">
-      <div class="step card reveal" data-delay="1">
-        <span class="num">01</span>
-        <h3>Describe</h3>
-        <p>Name, industry, mood, and colors to avoid, plus an optional logo. Logo colors are read in your browser and sent as seed tones. The image never leaves your machine.</p>
-      </div>
-      <div class="step card reveal" data-delay="2">
-        <span class="num">02</span>
-        <h3>Generate</h3>
-        <p>Your brief meets the live font catalog and real design constraints: 60-30-10 balance, color psychology, and a contrasting but readable pairing. A full kit returns in about two minutes.</p>
-      </div>
-      <div class="step card reveal" data-delay="3">
-        <span class="num">03</span>
-        <h3>Refine</h3>
-        <p>Nudge it in plain words. Try more playful or swap the accent. Only the requested change moves and everything else holds. Each version is logged to your history.</p>
-      </div>
+<main id="journey">
+  <section class="chapter" id="ch1" data-name="THRESHOLD">
+    <div class="beat">
+      <div class="tag">SAMPLE 00 · COLD OPEN</div>
+      <h1 class="display">Every brand is a <em>specimen.</em> Most are never properly studied.</h1>
+      <p class="lede">You are descending into the laboratory. Seven chambers. One continuous dolly move. <b>Do not touch the glass.</b></p>
+      <div class="spec-row"><span>DEPTH <b>0M</b></span><span>LIGHT <b>SINGLE SOURCE</b></span><span>SCROLL <b>TO DESCEND</b></span></div>
     </div>
   </section>
 
-  <!-- 05 RESULT -->
-  <section class="chapter reveal" id="begin">
-    <div class="folio-line"><span>Experiment 05, Result</span><span class="pg">p.05 / 05</span></div>
-    <span class="eyebrow">Result</span>
-    <h2 class="ch-title" data-split><span class="no">05</span>Set your first kit.</h2>
-    <p class="ch-sub">Free while in the specimen stage. Takes about two minutes, and every version stays in your history.</p>
-    <div class="cta-block card" style="margin-top:0;">
-      <span class="eyebrow">Assay complete</span>
-      <h2 data-split>Brief in, <em>brand out.</em></h2>
-      <p>One form, one kit, infinite refines. Accounts are coming soon. Sign in will live here.</p>
-      <a class="btn magnetic" href="app/">Run your assay</a>
-      <p class="fine">Set in Fraunces and IBM Plex · <a href="#">Sign in</a> (soon)</p>
+  <section class="chapter" id="ch2" data-name="SPECIMEN WALL">
+    <div class="beat">
+      <div class="tag">SAMPLE 01 · IN STORAGE</div>
+      <h2 class="display">The wall of <em>vials.</em></h2>
+      <p class="lede">Palettes held in suspension, backlit, catalogued. Racks drift past as the carriage scans. One vial catches the lamp and <b>ejects toward you</b>. Its color floods the chamber.</p>
+      <div class="spec-row"><span>VIALS <b>60</b></span><span>STATE <b>SUSPENDED</b></span><span>EJECTA <b>01</b></span></div>
     </div>
   </section>
 
-  <footer class="site">
-    <span>Specimen Lab · Index 2026</span>
-    <span><a href="app/">App</a> · <a href="#">Sign in</a> · <a href="#brief">Top</a> · <span id="fpsFoot">CHAMBER -- FPS</span></span>
-  </footer>
+  <section class="chapter" id="ch3" data-name="TYPE CHAMBER">
+    <div class="beat">
+      <div class="tag">SAMPLE 02 · UNDER THE LAMP</div>
+      <h2 class="display">Letterforms, <em>measured.</em></h2>
+      <p class="lede">Typography examined with calipers, not taste. X-height, baseline, stem. Nothing here was guessed at.</p>
+      <div class="spec-row"><span>SPECIMEN <b>Aa · 300PT</b></span><span>X-HEIGHT <b>CALIBRATED</b></span><span>STRESS <b>NONE DETECTED</b></span></div>
+    </div>
+  </section>
 
-</div>
+  <section class="chapter" id="ch4" data-name="EXPERIMENT TABLE">
+    <div class="beat">
+      <div class="tag">SAMPLE 03 · REACTION</div>
+      <h2 class="display">Two energies, <em>one result.</em></h2>
+      <p class="lede">Color vial meets letterform at the central instrument. A controlled reaction. This is the generation event itself, slowed down so you can watch it work.</p>
+      <div class="spec-row"><span>REAGENT A <b>COLOR</b></span><span>REAGENT B <b>TYPE</b></span><span>YIELD <b>ONE KIT</b></span></div>
+    </div>
+  </section>
 
-<div id="inspectBar" aria-live="polite"></div>
+  <section class="chapter" id="ch5" data-name="DISPLAY CASE">
+    <div class="beat">
+      <div class="tag">SAMPLE 04 · PRESERVED</div>
+      <h2 class="display">TestCo, <em>stabilized.</em></h2>
+      <p class="lede">Fintech brief. Deep blue trust base, amber energy accent, red explicitly avoided. Oswald over Inter. Contrast <b>13.9:1, AA pass</b>. The specimen is stable.</p>
+      <div class="kitline" id="kitline">
+        <span class="sw" style="background:#1D4ED8"></span><b>#1D4ED8</b> PRIMARY ·
+        <span class="sw" style="background:#0EA5E9"></span><b>#0EA5E9</b> SECONDARY ·
+        <span class="sw" style="background:#F59E0B"></span><b>#F59E0B</b> ACCENT ·
+        <span class="sw" style="background:#F8FAFC"></span><b>#F8FAFC</b> BACKGROUND ·
+        <span class="sw" style="background:#1E293B"></span><b>#1E293B</b> TEXT
+      </div>
+      <div class="cta-row"><a class="btn ghost" href="/app/">Open this kit in the app</a></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch6" data-name="ARCHIVE">
+    <div class="beat">
+      <div class="tag">SAMPLES 05+ · DEEP STORAGE</div>
+      <h2 class="display">Rows of cases, <em>receding.</em></h2>
+      <p class="lede">SeedCo. SupabaseCheck. Every prior assay, shelved and glowing faintly in the dark. The archive grows with each generation. Yours belongs here.</p>
+      <div class="spec-row"><span>CASES <b id="caseCount">ACCUMULATING</b></span><span>RETRIEVAL <b>INSTANT</b></span><span>ACCESS <b>HISTORY TAB</b></span></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch7" data-name="THRESHOLD LIGHT">
+    <div class="beat">
+      <div class="tag">EXIT · THRESHOLD OF LIGHT</div>
+      <h2 class="display">Begin your <em>specimen.</em></h2>
+      <p class="lede">One brief. One kit. Infinite refines. Step through.</p>
+      <div class="cta-row">
+        <a class="btn" href="/app/">Enter the lab</a>
+        <a class="btn ghost" href="#">Sign in (soon)</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="end">
+  <span>SPECIMEN LABS · SEVEN CHAMBERS · ONE DOLLY</span>
+  <span><a href="/app/">APP</a> · <a href="#ch1">TOP</a></span>
+</footer>
+
 <button type="button" id="toTop" aria-label="Back to top">↑</button>
 
 <script>
-const themeToggle = document.getElementById('themeToggle');
-(function initTheme(){
-  let theme = null;
-  try { theme = localStorage.getItem('specimen-theme'); } catch (e) {}
-  if (!theme) { theme = 'dark'; }
-  applyTheme(theme);
-})();
-themeToggle.addEventListener('click', () => {
-  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  try { localStorage.setItem('specimen-theme', next); } catch (e) {}
-});
-function applyTheme(theme){
-  document.documentElement.dataset.theme = theme;
-  themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
-  if (window.__chamberTheme) window.__chamberTheme(theme);
-}
+(function(){
+  const reduced = window.matchMedia && window.matchMedia('(prefers-color-scheme: no-preference)').matches === false &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { document.body.classList.add('reduced'); }
+  window.__labReduced = reduced || document.body.classList.contains('reduced');
 
-/* Reveals register first so content never gets stuck invisible. */
-function initReveals(){
-  if (!('IntersectionObserver' in window)) {
-    document.querySelectorAll('.reveal,.rule').forEach((el) => el.classList.add('in'));
-    startCounters();
-    return;
-  }
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in');
-        entry.target.querySelectorAll('h1, h2.ch-title').forEach(scrambleIn);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal:not(.in),.rule:not(.in)').forEach((el) => observer.observe(el));
-}
-initReveals();
-
-function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, (m) => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[m]));
-}
-
-/* Split headlines: every letter jumps on hover. */
-const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const finePointer = window.matchMedia && window.matchMedia('(hover:hover)').matches;
-(function splitText(){
-  if (reduceMotion) return;
-  document.querySelectorAll('[data-split]').forEach((el) => {
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-    const nodes = [];
-    while (walker.nextNode()) nodes.push(walker.currentNode);
-    nodes.forEach((node) => {
-      const frag = document.createDocumentFragment();
-      Array.from(node.textContent).forEach((ch) => {
-        if (ch === ' ' || ch === '\n') { frag.appendChild(document.createTextNode(' ')); return; }
-        const s = document.createElement('span');
-        s.className = 'ch';
-        s.textContent = ch;
-        s.addEventListener('mouseenter', () => {
-          s.animate(
-            [{ transform: 'translateY(0) rotate(0)' },
-             { transform: 'translateY(-9px) rotate(-4deg)', offset: 0.45 },
-             { transform: 'translateY(0) rotate(0)' }],
-            { duration: 340, easing: 'cubic-bezier(.2,.9,.3,1.2)' }
-          );
-        });
-        frag.appendChild(s);
-      });
-      node.parentNode.replaceChild(frag, node);
-    });
-  });
-})();
-
-/* Magnetic buttons. */
-(function magnetic(){
-  if (reduceMotion || !finePointer) return;
-  const els = Array.from(document.querySelectorAll('.magnetic'));
-  if (!els.length) return;
-  let raf = null, mx = -9999, my = -9999;
-  function frame(){
-    raf = null;
-    els.forEach((el) => {
-      const r = el.getBoundingClientRect();
-      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      const dx = mx - cx, dy = my - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      if (dist < 90) {
-        const pull = (90 - dist) / 90 * 7;
-        el.style.transform = 'translate(' + (dx / dist * pull).toFixed(1) + 'px,' + (dy / dist * pull).toFixed(1) + 'px)';
-      } else if (el.style.transform) {
-        el.style.transform = '';
-      }
-    });
-  }
-  window.addEventListener('mousemove', (e) => {
-    mx = e.clientX; my = e.clientY;
-    if (!raf) raf = requestAnimationFrame(frame);
-  }, { passive: true });
-})();
-
-/* Counting meters. */
-let countersStarted = false;
-function startCounters(){
-  if (countersStarted) return;
-  countersStarted = true;
-  document.querySelectorAll('[data-count]').forEach((el) => {
-    const target = parseFloat(el.dataset.count);
-    const dec = parseInt(el.dataset.dec || '0', 10);
-    const plus = el.dataset.plus === '1';
-    const dur = 1200, t0 = performance.now();
-    function tick(now){
-      const p = Math.min((now - t0) / dur, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      let out = (target * eased).toFixed(dec);
-      if (plus && dec === 0) { out = Math.round(target * eased).toLocaleString('en-US'); }
-      el.textContent = out;
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  });
-}
-if ('IntersectionObserver' in window) {
-  const cntObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) { startCounters(); cntObserver.disconnect(); }
-    });
-  }, { threshold: 0.2 });
-  document.querySelectorAll('[data-count]').forEach((el) => cntObserver.observe(el));
-} else {
-  startCounters();
-}
-
-/* Index rail + folio readout + chamber chapter. */
-if ('IntersectionObserver' in window) {
-  const railLinks = Array.from(document.querySelectorAll('.rail a'));
-  const byId = {};
-  railLinks.forEach((a) => { byId[a.dataset.ch] = a; });
-  const order = ['brief', 'sample', 'analyze', 'kits', 'begin'];
-  const folioNow = document.getElementById('folioNow');
-  const secObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        railLinks.forEach((a) => a.classList.remove('active'));
-        const link = byId[entry.target.id];
-        if (link) link.classList.add('active');
-        const idx = order.indexOf(entry.target.id);
-        if (folioNow && idx >= 0) folioNow.textContent = 'p.0' + (idx + 1) + ' / 05';
-        if (window.__chamberChapter) window.__chamberChapter(idx);
-        if (window.__chapterShape) window.__chapterShape(idx);
-        chapterWash();
-      }
-    });
-  }, { rootMargin: '-40% 0px -55% 0px' });
-  order.forEach((id) => {
-    const s = document.getElementById(id);
-    if (s) secObserver.observe(s);
-  });
-}
-
-/* Folder reveal + live reshuffler. */
-const N8N_GALLERY = new URLSearchParams(location.search).get('gallery') || 'http://localhost:5678/webhook/brand-kits';
-const FALLBACK_KITS = [
-  { brand_name: 'TestCo', industry: 'fintech', version: 1,
-    palette: [{hex:'#1D4ED8',role:'Primary'},{hex:'#0EA5E9',role:'Secondary'},{hex:'#F59E0B',role:'Accent'},{hex:'#F8FAFC',role:'Background'},{hex:'#1E293B',role:'Neutral / Text'}],
-    fonts: { heading: 'Oswald', body: 'Inter' } },
-  { brand_name: 'SeedCo', industry: 'food', version: 1,
-    palette: [{hex:'#E63946',role:'Primary'},{hex:'#F1FA8C',role:'Secondary'},{hex:'#FFB703',role:'Accent'},{hex:'#FFF9F0',role:'Background'},{hex:'#3A2E2A',role:'Neutral / Text'}],
-    fonts: { heading: 'Baloo 2', body: 'Nunito Sans' } },
-  { brand_name: 'SupabaseCheck', industry: 'logistics', version: 1,
-    palette: [{hex:'#1A3A5C',role:'Primary'},{hex:'#2E86AB',role:'Secondary'},{hex:'#27AE60',role:'Accent'},{hex:'#F8FAFC',role:'Background'},{hex:'#212529',role:'Neutral / Text'}],
-    fonts: { heading: 'Fraunces', body: 'Inter' } }
-];
-function channelLum(h){
-  const c = parseInt(h.slice(1), 16);
-  const rgb = [(c >> 16) & 255, (c >> 8) & 255, c & 255].map((v) => {
-    v /= 255;
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
-}
-function contrastRatio(hexA, hexB){
-  const l1 = channelLum(hexA), l2 = channelLum(hexB);
-  const hi = Math.max(l1, l2), lo = Math.min(l1, l2);
-  return (hi + 0.05) / (lo + 0.05);
-}
-function kitContrast(kit){
-  const pal = Array.isArray(kit.palette) ? kit.palette : [];
-  const bg = pal.find((c) => /background/i.test(c.role || '')) || {};
-  const tx = pal.find((c) => /text|neutral/i.test(c.role || '')) || {};
-  if (!bg.hex || !tx.hex) return null;
-  return contrastRatio(tx.hex, bg.hex);
-}
-const folder = document.getElementById('folder');
-const featuredKit = document.getElementById('featuredKit');
-const sampleMeta = document.getElementById('sampleMeta');
-const reshuffleBtn = document.getElementById('reshuffleBtn');
-let sampleIndex = 0;
-function nextInRotation(pool){
-  if (!pool.length) return null;
-  sampleIndex = sampleIndex % pool.length;
-  const kit = pool[sampleIndex];
-  sampleIndex = (sampleIndex + 1) % pool.length;
-  return kit;
-}
-function renderSample(kit, source){
-  const pal = Array.isArray(kit.palette) ? kit.palette : [];
-  featuredKit.innerHTML =
-    '<h3 style="font-family:\'' + escapeHtml((kit.fonts && kit.fonts.heading) || 'Fraunces') + '\',serif;">' + escapeHtml(kit.brand_name || 'Untitled') + '</h3>' +
-    '<div class="dots">' + pal.map((c) => '<span class="dot" data-role="' + escapeHtml(c.role || '') + '" data-hex="' + escapeHtml(c.hex || '') + '" style="background:' + escapeHtml(c.hex || '#ccc') + '" title="' + escapeHtml((c.role || '') + ' ' + (c.hex || '')) + '"></span>').join('') + '</div>' +
-    '<div class="tl"><b>' + escapeHtml((kit.fonts && kit.fonts.heading) || '') + '</b> with ' + escapeHtml((kit.fonts && kit.fonts.body) || '') + '</div>';
-  featuredKit.querySelectorAll('.dot').forEach((d) => {
-    d.addEventListener('mouseenter', () => inspectPart(d.dataset.role, d.dataset.hex, kit));
-  });
-  const ratio = kitContrast(kit);
-  sampleMeta.textContent =
-    (kit.brand_name || 'Untitled') + ' · ' + (kit.industry || 'unspecified') +
-    ' · v' + (kit.version || 1) + ' · ' + ((kit.fonts && kit.fonts.heading) || '') +
-    ' / ' + ((kit.fonts && kit.fonts.body) || '') +
-    (ratio ? ' · contrast ' + ratio.toFixed(1) + ':1 computed' : '') +
-    ' · via ' + source;
-}
-function replayFolder(){
-  folder.classList.remove('open');
-  void folder.offsetWidth;
-  folder.classList.add('open');
-}
-renderSample(FALLBACK_KITS[0], 'local sample');
-sampleIndex = 1;
-if ('IntersectionObserver' in window) {
-  const folderObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        folder.classList.add('open');
-        folderObserver.unobserve(folder);
-      }
-    });
-  }, { threshold: 0.35 });
-  folderObserver.observe(folder);
-} else {
-  folder.classList.add('open');
-}
-reshuffleBtn.addEventListener('click', async () => {
-  reshuffleBtn.disabled = true;
-  reshuffleBtn.textContent = 'Assaying…';
-  sampleMeta.textContent = 'Asking the logbook for a kit…';
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
-  try {
-    const res = await fetch(N8N_GALLERY + '?action=list&t=' + Date.now(), { signal: controller.signal });
-    if (!res.ok) throw new Error('status ' + res.status);
-    const data = await res.json();
-    const kits = Array.isArray(data.kits) ? data.kits.filter((k) => k && k.id && Array.isArray(k.palette) && k.palette.length) : [];
-    if (!kits.length) throw new Error('empty log');
-    renderSample(nextInRotation(kits), 'live log');
-  } catch (err) {
-    renderSample(nextInRotation(FALLBACK_KITS), 'local sample (log unreachable)');
-  } finally {
-    clearTimeout(timer);
-    replayFolder();
-    reshuffleBtn.disabled = false;
-    reshuffleBtn.textContent = 'Assay another';
-  }
-});
-
-/* Contrast bench: drag the tone, flip the stamp. */
-(function bench(){
-  const range = document.getElementById('clRange');
-  const text = document.getElementById('clText');
-  const stage = document.getElementById('clStage');
-  const ratioEl = document.getElementById('clRatio');
-  const stamp = document.getElementById('clStamp');
-  const bar = document.getElementById('clBar');
-  const hexEl = document.getElementById('clHex');
-  if (!range) return;
-  const BG = '#F8FAFC';
-  function paint(){
-    const L = parseInt(range.value, 10);
-    const hex = 'hsl(222, 30%, ' + L + '%)';
-    text.style.color = hex;
-    const c = document.createElement('canvas').getContext('2d');
-    c.fillStyle = hex;
-    const rgb = c.fillStyle;
-    const m = rgb.match(/\d+/g).map(Number);
-    const toHex = '#' + m.map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();
-    const r = contrastRatio(toHex, BG);
-    ratioEl.textContent = r.toFixed(1);
-    hexEl.textContent = toHex + ' · L ' + channelLum(toHex).toFixed(3);
-    const pass = r >= 4.5;
-    stamp.textContent = pass ? 'AA PASS' : 'AA FAIL';
-    stamp.classList.toggle('fail', !pass);
-    bar.style.width = Math.min(r / 21 * 100, 100) + '%';
-    bar.style.background = pass ? 'var(--pass)' : 'var(--fail)';
-  }
-  range.addEventListener('input', paint);
-  paint();
-})();
-
-/* Global inspect readout. */
-const inspectBar = document.getElementById('inspectBar');
-let inspectTimer = null;
-function inspectPart(role, hex, kit){
-  if (!hex) return;
-  const pal = Array.isArray(kit.palette) ? kit.palette : [];
-  const bg = (pal.find((c) => /background/i.test(c.role || '')) || {}).hex || '#F8FAFC';
-  const tx = (pal.find((c) => /text|neutral/i.test(c.role || '')) || {}).hex || '#1E293B';
-  let rBg = '-', rTx = '-';
-  try {
-    rBg = contrastRatio(hex, bg).toFixed(1);
-    rTx = contrastRatio(hex, tx).toFixed(1);
-  } catch (e) {}
-  inspectBar.innerHTML = 'PART <b>' + escapeHtml(role || 'swatch') + '</b> · HEX <b>' + escapeHtml(hex) +
-    '</b> · VS BG <b>' + rBg + ':1</b> · VS TEXT <b>' + rTx + ':1</b>';
-  inspectBar.classList.add('show');
-  clearTimeout(inspectTimer);
-  inspectTimer = setTimeout(() => inspectBar.classList.remove('show'), 2600);
-  if (window.__chamberFocusHex) window.__chamberFocusHex(hex);
-}
-document.querySelectorAll('.token').forEach((tok) => {
-  tok.addEventListener('mouseenter', () => {
-    inspectBar.innerHTML = 'TOKEN <b>' + escapeHtml(tok.dataset.role || '') + '</b> · HEX <b>' +
-      escapeHtml(tok.dataset.hex || '') + '</b> · LUMINANCE <b>' + escapeHtml(tok.dataset.lum || '') + '</b>';
-    inspectBar.classList.add('show');
-    clearTimeout(inspectTimer);
-    inspectTimer = setTimeout(() => inspectBar.classList.remove('show'), 2600);
-    if (window.__chamberFocusHex) window.__chamberFocusHex(tok.dataset.hex);
-  });
-});
-document.querySelectorAll('.sheet .frame .dot').forEach((d) => {
-  d.addEventListener('mouseenter', () => {
-    const card = d.closest('.sheet');
-    const name = card ? card.querySelector('h3').textContent : '';
-    const kit = FALLBACK_KITS.find((k) => k.brand_name === name) || FALLBACK_KITS[0];
-    const idx = Array.from(d.parentNode.children).indexOf(d);
-    const part = (kit.palette && kit.palette[idx]) || {};
-    inspectPart(part.role, part.hex, kit);
-  });
-});
-
-const toTop = document.getElementById('toTop');
-window.addEventListener('scroll', () => {
-  toTop.classList.toggle('show', window.scrollY > 600);
-}, { passive: true });
-toTop.addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-/* Letter scramble for headlines. */
-const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#%&/';
-function scrambleIn(el){
-  if (reduceMotion || !el || el.dataset.scrambled) return;
-  el.dataset.scrambled = '1';
-  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-  const states = [];
-  while (walker.nextNode()) {
-    if (walker.currentNode.textContent.trim().length) {
-      states.push({ n: walker.currentNode, orig: walker.currentNode.textContent });
-    }
-  }
-  if (!states.length) return;
-  let frame = 0;
-  const iv = setInterval(() => {
-    frame++;
-    let done = true;
-    states.forEach((s) => {
-      const reveal = Math.floor(frame / 2);
-      let out = '';
-      for (let i = 0; i < s.orig.length; i++) {
-        const ch = s.orig[i];
-        if (ch === ' ' || ch === '\n' || i < reveal) { out += ch; }
-        else { out += GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; done = false; }
-      }
-      s.n.textContent = out;
-    });
-    if (done) { clearInterval(iv); states.forEach((s) => { s.n.textContent = s.orig; }); }
-  }, 34);
-}
-
-/* Frost-wash chapter cut. */
-let washTimer = null;
-function chapterWash(){
-  if (reduceMotion) return;
-  const frost = document.getElementById('frost');
-  if (!frost) return;
-  frost.classList.add('wash');
-  clearTimeout(washTimer);
-  washTimer = setTimeout(() => frost.classList.remove('wash'), 150);
-}
-
-/* Intro sequence: scramble, counter, dissolve. */
-(function intro(){
-  const box = document.getElementById('intro');
-  if (!box) return;
-  if (reduceMotion) { box.remove(); return; }
-  const word = document.getElementById('introWord');
-  const pct = document.getElementById('introPct');
-  const sub = document.getElementById('introSub');
-  const subs = ['CALIBRATING INSTRUMENTS', 'LOADING FONT CATALOG', 'CHECKING CONTRAST', 'OPENING THE CHAMBER'];
-  let gone = false;
+  /* Loader: real milestones + failsafe. */
+  const loader = document.getElementById('loader');
+  const pct = document.getElementById('loadPct');
+  const sub = document.getElementById('loadSub');
+  const subs = ['CALIBRATING INSTRUMENTS', 'GROWING SPECIMEN JARS', 'RACKING THE VIALS', 'FOCUSING THE LAMP'];
+  let progress = 0, done = false;
+  window.__labProgress = (p) => { progress = Math.max(progress, Math.min(p, 0.97)); };
   function finish(){
-    if (gone) return;
-    gone = true;
-    box.classList.add('gone');
-    setTimeout(() => box.remove(), 1000);
+    if (done) return;
+    done = true;
+    loader.classList.add('gone');
+    setTimeout(() => loader.remove(), 1100);
+    document.dispatchEvent(new CustomEvent('lab:ready'));
   }
-  box.addEventListener('click', finish);
-  setTimeout(finish, 6000);
-  const orig = 'SPECIMEN';
+  loader.addEventListener('click', finish);
+  setTimeout(finish, 9000);
+  window.__labFinish = finish;
   let frame = 0;
-  const total = 46;
   const iv = setInterval(() => {
     frame++;
-    const p = Math.min(frame / total, 1);
-    pct.textContent = String(Math.floor(p * 100)).padStart(2, '0');
-    sub.textContent = subs[Math.min(Math.floor(p * subs.length), subs.length - 1)];
-    let out = '';
-    for (let i = 0; i < orig.length; i++) {
-      out += (i / orig.length < p - 0.12) ? orig[i] : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-    }
-    word.textContent = out;
-    if (p >= 1) {
-      clearInterval(iv);
-      word.innerHTML = 'SPECI<em>MEN</em>';
-      setTimeout(finish, 350);
-    }
-  }, 36);
-})();
+    const shown = Math.min(progress + frame * 0.004, 0.99);
+    pct.textContent = String(Math.floor(shown * 100)).padStart(2, '0');
+    sub.textContent = subs[Math.min(Math.floor(shown * subs.length), subs.length - 1)];
+    if (progress >= 0.97 && frame > 40) { clearInterval(iv); pct.textContent = '100'; setTimeout(finish, 300); }
+  }, 50);
 
-/* Timecode */
-const tcEl = document.querySelector('nav.main .tc');
-if (tcEl) {
-  const t0 = Date.now();
-  setInterval(() => {
-    const s = Math.floor((Date.now() - t0) / 1000);
-    const p = (n) => String(n).padStart(2, '0');
-    const label = tcEl.querySelector('span:last-child');
-    if (label) label.textContent = p(Math.floor(s / 3600)) + ':' + p(Math.floor(s / 60) % 60) + ':' + p(s % 60);
-  }, 500);
-}
+  /* Chapter lighting: which beat is lit. */
+  const chapters = Array.from(document.querySelectorAll('.chapter'));
+  const readout = document.getElementById('chamberReadout');
+  const order = ['ch1','ch2','ch3','ch4','ch5','ch6','ch7'];
+  function light(i){
+    chapters.forEach((c, k) => c.classList.toggle('lit', k === i));
+    const names = ['THRESHOLD','SPECIMEN WALL','TYPE CHAMBER','EXPERIMENT TABLE','DISPLAY CASE','ARCHIVE','THRESHOLD LIGHT'];
+    if (readout) readout.textContent = 'CH.0' + (i + 1) + ' / ' + names[i];
+    if (window.__labChapter) window.__labChapter(i);
+  }
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) light(order.indexOf(e.target.id));
+      });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    chapters.forEach((c) => obs.observe(c));
+  } else {
+    chapters.forEach((c) => c.classList.add('lit'));
+  }
+
+  /* Scroll velocity -> chromatic shimmer on headlines. */
+  let lastY = window.scrollY, vel = 0, cool = null;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    vel = Math.abs(y - lastY);
+    lastY = y;
+    if (vel > 60) {
+      document.body.classList.add('fast');
+      clearTimeout(cool);
+      cool = setTimeout(() => document.body.classList.remove('fast'), 160);
+    }
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - window.innerHeight;
+    const bar = document.getElementById('scrollbar');
+    if (bar && max > 0) bar.style.transform = 'scaleX(' + (y / max) + ')';
+    const top = document.getElementById('toTop');
+    if (top) top.classList.toggle('show', y > 600);
+  }, { passive: true });
+  const top = document.getElementById('toTop');
+  if (top) top.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+})();
 </script>
 
 <script type="module">
@@ -975,307 +329,370 @@ import * as THREE from 'three';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-const reduceMotionM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const fpsEl = document.getElementById('fpsFoot');
+const fpsSpan = null;
+const reduced = !!window.__labReduced;
+let progress = 0, chapterMix = 0, chapterTarget = 0, booted = false;
 
-if (reduceMotionM || !window.WebGLRenderingContext) {
-  if (fpsEl) fpsEl.textContent = 'CHAMBER OFF';
+window.__labChapter = (i) => { chapterTarget = i < 0 ? 0 : i / 6; };
+
+if (reduced || !window.WebGLRenderingContext) {
+  document.body.classList.add('reduced');
+  if (window.__labFinish) window.__labFinish();
 } else try {
-  const host = document.getElementById('chamber');
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  gsap.registerPlugin(ScrollTrigger);
+  const host = document.getElementById('world');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.domElement.style.cursor = 'grab';
+  renderer.setClearColor(0x0B0D0C, 1);
   host.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x101214, 0.058);
-  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0.4, 13);
-
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-  const key = new THREE.DirectionalLight(0xfff2df, 1.2);
-  key.position.set(5, 8, 6);
+  scene.fog = new THREE.FogExp2(0x0B0D0C, 0.028);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 220);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.32));
+  const key = new THREE.DirectionalLight(0xfff2df, 1.1);
+  key.position.set(5, 9, 6);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xF5A623, 0.7);
-  rim.position.set(-6, -3, -4);
-  scene.add(rim);
+  const lampCyan = new THREE.PointLight(0x7FDCD0, 0, 40);
+  const lampAmber = new THREE.PointLight(0xE8B84B, 0, 40);
+  const lampBrass = new THREE.PointLight(0xB08D57, 0, 60);
+  scene.add(lampCyan, lampAmber, lampBrass);
 
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xdfe8e4, roughness: 0.12, metalness: 0,
+    transmission: 0.92, thickness: 0.6, transparent: true, opacity: 1
+  });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xB08D57, roughness: 0.38, metalness: 0.85 });
+
+  /* CH1: the jar + heartbeat. */
+  const jarPts = [];
+  for (let i = 0; i <= 20; i++) {
+    const v = i / 20;
+    jarPts.push(new THREE.Vector2(1.15 + Math.sin(v * Math.PI) * 0.12 - v * 0.1, v * 2.6 - 1.3));
+  }
+  const jar = new THREE.Mesh(new THREE.LatheGeometry(jarPts, 48), glassMat);
+  jar.position.set(0, 0.4, 0);
+  const jarRim = new THREE.Mesh(new THREE.TorusGeometry(1.06, 0.07, 12, 48), brassMat);
+  jarRim.rotation.x = Math.PI / 2;
+  jarRim.position.set(0, 1.7, 0);
+  const heart = new THREE.PointLight(0x7FDCD0, 2.2, 9);
+  heart.position.set(0, 0.4, 0.6);
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.32, 24, 24),
+    new THREE.MeshBasicMaterial({ color: 0x9ff0e4, transparent: true, opacity: 0.9 })
+  );
+  core.position.set(0, 0.4, 0);
+  scene.add(jar, jarRim, heart, core);
+
+  /* CH2: vial wall + ejecta. */
+  const vialGeo = new THREE.CylinderGeometry(0.16, 0.16, 0.9, 12);
+  const vialGlass = new THREE.MeshStandardMaterial({ color: 0xcfd8d2, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.35 });
+  const vialCols = ['#1D4ED8', '#0EA5E9', '#F59E0B', '#E63946', '#27AE60', '#2E86AB'];
+  const vials = new THREE.InstancedMesh(vialGeo, vialGlass, 60);
+  const fills = new THREE.InstancedMesh(
+    new THREE.CylinderGeometry(0.11, 0.11, 0.55, 10),
+    new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0.1, emissiveIntensity: 1.4 }),
+    60
+  );
+  {
+    const d = new THREE.Object3D(), c = new THREE.Color();
+    let k = 0;
+    for (let r = 0; r < 5; r++) for (let col = 0; col < 12; col++) {
+      const px = (col - 5.5) * 0.85, py = (r - 2) * 1.15 + 0.4;
+      d.position.set(px, py, -7);
+      d.updateMatrix();
+      vials.setMatrixAt(k, d.matrix);
+      fills.setMatrixAt(k, d.matrix);
+      fills.setColorAt(k, c.set(vialCols[(r + col) % vialCols.length]));
+      k++;
+    }
+  }
+  const wall = new THREE.Group();
+  wall.add(vials, fills);
+  scene.add(wall);
+  const ejecta = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.22, 0.22, 1.2, 16),
+    new THREE.MeshStandardMaterial({ color: 0xF59E0B, emissive: 0xF59E0B, emissiveIntensity: 2.2, roughness: 0.3 })
+  );
+  ejecta.visible = false;
+  scene.add(ejecta);
+  const flood = new THREE.PointLight(0xF59E0B, 0, 30);
+  scene.add(flood);
+
+  /* CH3: letterforms + calipers. */
+  const typeGroup = new THREE.Group();
+  typeGroup.position.set(0, 0.2, -17);
+  scene.add(typeGroup);
   const font = await new FontLoader().loadAsync(
     'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json'
   );
-
-  const group = new THREE.Group();
-  scene.add(group);
-  const WORD = 'SPECIMEN';
-  const PALETTE = ['#1D4ED8', '#0EA5E9', '#F59E0B', '#F8FAFC', '#1E293B'];
-  const letters = [];
-  let cursor = 0;
-  const widths = [];
-  [...WORD].forEach((ch) => {
-    const g = new TextGeometry(ch, {
-      font: font, size: 1.7, height: 0.45,
-      curveSegments: 6, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.02, bevelSegments: 2
-    });
-    g.computeBoundingBox();
-    const w = g.boundingBox.max.x - g.boundingBox.min.x;
-    widths.push(w);
-    cursor += w;
-  });
-  const total = cursor + (WORD.length - 1) * 0.55;
-  let x = -total / 2;
-  [...WORD].forEach((ch, i) => {
-    const geo = new TextGeometry(ch, {
-      font: font, size: 1.7, height: 0.45,
-      curveSegments: 6, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.02, bevelSegments: 2
-    });
-    const hex = PALETTE[i % PALETTE.length];
-    const mat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(hex), roughness: 0.32, metalness: 0.6,
-      transparent: true, opacity: 0.94,
-      emissive: new THREE.Color(hex), emissiveIntensity: 0.12
-    });
-    const m = new THREE.Mesh(geo, mat);
-    const w = widths[i];
-    m.position.set(x + w / 2, Math.sin(i * 0.9) * 0.45 - 0.4, Math.cos(i * 0.7) * 0.8 - 1.5);
-    m.rotation.y = -0.18;
-    m.userData = { hex: hex.toUpperCase(), base: 1, phase: i * 1.1, baseY: m.position.y, char: ch };
-    x += w + 0.55;
-    group.add(m);
-    letters.push(m);
-  });
-
-  /* Frozen enclosures: displaced glass shells on a fresnel shader. */
-  function shellGeo(r){
-    const g = new THREE.IcosahedronGeometry(r, 2);
-    const pos = g.attributes.position;
-    const v = new THREE.Vector3();
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i);
-      const n = 1 + 0.09 * Math.sin(v.x * 2.1 + v.y * 1.7) * Math.cos(v.y * 1.9 + v.z * 2.3);
-      v.multiplyScalar(n);
-      pos.setXYZ(i, v.x, v.y, v.z);
-    }
-    g.computeVertexNormals();
-    return g;
+  if (window.__labProgress) window.__labProgress(0.55);
+  const bigA = new THREE.Mesh(
+    new TextGeometry('Aa', { font: font, size: 3.2, height: 0.7, curveSegments: 8, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.03, bevelSegments: 2 }),
+    new THREE.MeshStandardMaterial({ color: 0xE8E6DF, roughness: 0.35, metalness: 0.25 })
+  );
+  bigA.geometry.center();
+  typeGroup.add(bigA);
+  const caliper = new THREE.Mesh(
+    new THREE.TorusGeometry(3.1, 0.025, 8, 128),
+    new THREE.MeshBasicMaterial({ color: 0xB08D57, transparent: true, opacity: 0.8 })
+  );
+  typeGroup.add(caliper);
+  function hline(y, w){
+    const g = new THREE.BufferGeometry().setFromPoints(
+      [new THREE.Vector3(-w, y, 0), new THREE.Vector3(w, y, 0)]);
+    return new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0x7FDCD0, transparent: true, opacity: 0.55 }));
   }
-  const fresnelMat = new THREE.ShaderMaterial({
-    uniforms: { uColor: { value: new THREE.Color(0x9fb6c9) } },
-    vertexShader: 'varying vec3 vN; varying vec3 vV;\n' +
-      'void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0);' +
-      ' vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz);' +
-      ' gl_Position = projectionMatrix * mv; }',
-    fragmentShader: 'uniform vec3 uColor; varying vec3 vN; varying vec3 vV;\n' +
-      'void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);' +
-      ' gl_FragColor = vec4(uColor * f + vec3(0.55, 0.62, 0.68) * f * 0.6, f * 0.75); }',
-    transparent: true, depthWrite: false, side: THREE.DoubleSide
-  });
-  const shells = [];
-  [[-7.5, 0.6, -5, 3.1], [7.2, -0.6, -6, 3.7], [0, 3.8, -9, 4.6]].forEach((s, i) => {
-    const m = new THREE.Mesh(shellGeo(s[3]), fresnelMat);
-    m.position.set(s[0], s[1], s[2]);
-    m.userData.spin = (i % 2 ? -1 : 1) * (0.05 + i * 0.02);
-    scene.add(m);
-    shells.push(m);
-  });
+  [-1.15, -0.35, 1.15].forEach((y) => typeGroup.add(hline(y, 3.4)));
 
-  /* Particle index: one cloud, five shapes, morphs per chapter. */
-  const COUNT = 420;
-  function rnd(i, salt){
-    const v = Math.sin(i * 127.1 + (salt || 0) * 311.7) * 43758.5453;
-    return v - Math.floor(v);
-  }
-  function shapePoint(shape, i, out){
-    const f = i / COUNT;
-    if (shape === 0) {
-      const th = rnd(i, 1) * Math.PI * 2, ph = Math.acos(2 * rnd(i, 2) - 1), r = 4.4;
-      out[0] = r * Math.sin(ph) * Math.cos(th);
-      out[1] = r * Math.cos(ph);
-      out[2] = r * Math.sin(ph) * Math.sin(th) - 3;
-    } else if (shape === 1) {
-      const a = f * Math.PI * 9;
-      out[0] = Math.cos(a) * 3.1;
-      out[1] = (f - 0.5) * 9.5;
-      out[2] = Math.sin(a) * 3.1 - 3;
-    } else if (shape === 2) {
-      const u = rnd(i, 3) * Math.PI * 2, v = rnd(i, 4) * Math.PI * 2;
-      const R = 4.1, r = 1.35;
-      out[0] = (R + r * Math.cos(v)) * Math.cos(u);
-      out[1] = r * Math.sin(v);
-      out[2] = (R + r * Math.cos(v)) * Math.sin(u) - 3;
-    } else if (shape === 3) {
-      out[0] = (rnd(i, 5) - 0.5) * 7.4;
-      out[1] = (rnd(i, 6) - 0.5) * 7.4;
-      out[2] = (rnd(i, 7) - 0.5) * 7.4 - 3;
-    } else {
-      const r = 4.6 * Math.sqrt(rnd(i, 8)), a = rnd(i, 9) * Math.PI * 2;
-      out[0] = Math.cos(a) * r;
-      out[1] = (rnd(i, 10) - 0.5) * 0.8;
-      out[2] = Math.sin(a) * r - 3;
+  /* CH4: reaction. */
+  const orbA = new THREE.Mesh(
+    new THREE.SphereGeometry(0.55, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0x0EA5E9, emissive: 0x0EA5E9, emissiveIntensity: 2.4 })
+  );
+  const orbB = new THREE.Mesh(
+    new THREE.SphereGeometry(0.55, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xE8B84B, emissive: 0xE8B84B, emissiveIntensity: 2.4 })
+  );
+  const react = new THREE.Group();
+  react.add(orbA, orbB);
+  react.position.set(0, 0.3, -27);
+  scene.add(react);
+  const flash = new THREE.PointLight(0xffffff, 0, 40);
+  flash.position.set(0, 0.3, -27);
+  scene.add(flash);
+  const shock = new THREE.Mesh(
+    new THREE.TorusGeometry(1, 0.05, 8, 64),
+    new THREE.MeshBasicMaterial({ color: 0xfff2df, transparent: true, opacity: 0 })
+  );
+  shock.position.set(0, 0.3, -27);
+  shock.rotation.x = Math.PI / 2;
+  scene.add(shock);
+
+  /* CH5: display case. */
+  const caseGroup = new THREE.Group();
+  caseGroup.position.set(0, -0.4, -37);
+  scene.add(caseGroup);
+  const caseCols = ['#1D4ED8', '#0EA5E9', '#F59E0B', '#F8FAFC', '#1E293B'];
+  caseCols.forEach((hex, i) => {
+    const sw = new THREE.Mesh(
+      new THREE.BoxGeometry(0.9, 1.3, 0.08),
+      new THREE.MeshStandardMaterial({ color: new THREE.Color(hex), roughness: 0.5, emissive: new THREE.Color(hex), emissiveIntensity: 0.25 })
+    );
+    sw.position.set((i - 2) * 1.05, 0.4, 0);
+    caseGroup.add(sw);
+  });
+  const caseGlass = new THREE.Mesh(
+    new THREE.BoxGeometry(5.6, 3.0, 1.6),
+    new THREE.MeshStandardMaterial({ color: 0xcfd8d2, roughness: 0.08, metalness: 0, transparent: true, opacity: 0.13 })
+  );
+  caseGlass.position.y = 0.4;
+  caseGroup.add(caseGlass);
+  const caseEdges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(5.6, 3.0, 1.6)),
+    new THREE.LineBasicMaterial({ color: 0xB08D57 })
+  );
+  caseEdges.position.y = 0.4;
+  caseGroup.add(caseEdges);
+  const caseBase = new THREE.Mesh(new THREE.BoxGeometry(6.0, 0.25, 2.0), brassMat);
+  caseBase.position.y = -1.25;
+  caseGroup.add(caseBase);
+  const caseLamp = new THREE.PointLight(0xfff2df, 8, 12);
+  caseLamp.position.set(0, 2.4, 1.2);
+  caseGroup.add(caseLamp);
+
+  /* CH6: archive rows. */
+  const archive = new THREE.Group();
+  const archGeo = new THREE.BoxGeometry(1.4, 2.0, 1.0);
+  const archMat = new THREE.MeshStandardMaterial({ color: 0x141817, roughness: 0.6 });
+  const archGlow = new THREE.MeshStandardMaterial({ color: 0x7FDCD0, emissive: 0x7FDCD0, emissiveIntensity: 1.1 });
+  const archN = 42;
+  const archBoxes = new THREE.InstancedMesh(archGeo, archMat, archN);
+  const archWins = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.9, 0.5), archGlow, archN);
+  {
+    const d = new THREE.Object3D();
+    let k = 0;
+    for (let row = 0; row < 7; row++) for (let col = 0; col < 6; col++) {
+      const px = (col - 2.5) * 2.2, pz = -48 - row * 3.4;
+      d.position.set(px, 0.6, pz);
+      d.updateMatrix();
+      archBoxes.setMatrixAt(k, d.matrix);
+      d.position.set(px, 0.9, pz + 0.51);
+      d.rotation.set(0, 0, 0);
+      d.updateMatrix();
+      archWins.setMatrixAt(k, d.matrix);
+      k++;
     }
   }
+  archive.add(archBoxes, archWins);
+  scene.add(archive);
+
+  /* CH7: door of light. */
+  const doorCvs = document.createElement('canvas');
+  doorCvs.width = 64; doorCvs.height = 128;
+  const dctx = doorCvs.getContext('2d');
+  const grad = dctx.createLinearGradient(0, 0, 0, 128);
+  grad.addColorStop(0, '#fff6e3');
+  grad.addColorStop(0.55, '#f5d9a0');
+  grad.addColorStop(1, '#B08D57');
+  dctx.fillStyle = grad;
+  dctx.fillRect(0, 0, 64, 128);
+  const doorTex = new THREE.CanvasTexture(doorCvs);
+  const door = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.2, 8),
+    new THREE.MeshBasicMaterial({ map: doorTex, transparent: true, opacity: 0.95 })
+  );
+  door.position.set(0, 1.6, -82);
+  const doorGlow = new THREE.PointLight(0xffe9c4, 30, 40);
+  doorGlow.position.set(0, 2, -79);
+  const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(5.0, 8.8, 0.5), brassMat);
+  doorFrame.position.set(0, 1.6, -82.4);
+  scene.add(door, doorGlow, doorFrame);
+
+  /* Dust. */
   const pGeo = new THREE.BufferGeometry();
-  const cur = new Float32Array(COUNT * 3);
-  const from = new Float32Array(COUNT * 3);
-  const to = new Float32Array(COUNT * 3);
-  const col = new Float32Array(COUNT * 3);
-  const tmp = [0, 0, 0];
-  for (let i = 0; i < COUNT; i++) {
-    shapePoint(0, i, tmp);
-    cur[i * 3] = tmp[0]; cur[i * 3 + 1] = tmp[1]; cur[i * 3 + 2] = tmp[2];
-    from[i * 3] = tmp[0]; from[i * 3 + 1] = tmp[1]; from[i * 3 + 2] = tmp[2];
-    to[i * 3] = tmp[0]; to[i * 3 + 1] = tmp[1]; to[i * 3 + 2] = tmp[2];
+  const pCount = 320, pos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * 30;
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 14;
+    pos[i * 3 + 2] = 6 - Math.random() * 95;
   }
-  pGeo.setAttribute('position', new THREE.BufferAttribute(cur, 3));
-  pGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  const pMat = new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true, opacity: 0.9 });
-  const cloud = new THREE.Points(pGeo, pMat);
-  scene.add(cloud);
-  const amber = new THREE.Color(0xF5A623), sage = new THREE.Color(0x8B9474), mixC = new THREE.Color();
-  let morphT = 1;
-  window.__chapterShape = (idx) => {
-    const s = idx < 0 ? 0 : idx % 5;
-    from.set(cur);
-    for (let i = 0; i < COUNT; i++) {
-      shapePoint(s, i, tmp);
-      to[i * 3] = tmp[0]; to[i * 3 + 1] = tmp[1]; to[i * 3 + 2] = tmp[2];
-    }
-    morphT = 0;
-  };
-
-  const dGeo = new THREE.BufferGeometry();
-  const dCount = 170, dPos = new Float32Array(dCount * 3);
-  for (let i = 0; i < dCount; i++) {
-    dPos[i * 3] = (Math.random() - 0.5) * 26;
-    dPos[i * 3 + 1] = (Math.random() - 0.5) * 16;
-    dPos[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2;
-  }
-  dGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3));
-  const dust = new THREE.Points(dGeo, new THREE.PointsMaterial({ color: 0x8B9474, size: 0.035, transparent: true, opacity: 0.4 }));
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const dust = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x9A978C, size: 0.045, transparent: true, opacity: 0.55 }));
   scene.add(dust);
 
-  let mx = 0, my = 0, tx = 0, ty = 0, focusedHex = null, focusTimer = 0;
-  let dragVel = 0, dragging = false, lastPX = 0, downX = 0, downY = 0;
-  let chapterMix = 0, chapterTarget = 0;
-  window.__chamberFocusHex = (hex) => { focusedHex = (hex || '').toUpperCase(); focusTimer = 140; };
-  window.__chamberChapter = (idx) => { chapterTarget = idx < 0 ? 0 : (idx % 5) / 4; };
-  window.__chamberTheme = (theme) => {
-    scene.fog.color.set(theme !== 'light' ? 0x101214 : 0xEEEFEA);
-  };
-  if (document.documentElement.dataset.theme === 'light') scene.fog.color.set(0xEEEFEA);
-
-  const ray = new THREE.Raycaster();
-  const ptr = new THREE.Vector2();
-  function pickLetter(cx, cy){
-    ptr.x = (cx / window.innerWidth) * 2 - 1;
-    ptr.y = -(cy / window.innerHeight) * 2 + 1;
-    ray.setFromCamera(ptr, camera);
-    const hits = ray.intersectObjects(letters, false);
-    return hits.length ? hits[0].object : null;
+  /* Camera stations: one dolly through all chambers. */
+  const stations = [
+    { p: [0, 0.6, 8.5], l: [0, 0.4, 0] },
+    { p: [0, 0.5, 3.2], l: [0, 0.3, -7] },
+    { p: [0, 0.3, -10.5], l: [0, 0.2, -17] },
+    { p: [0, 0.4, -20.5], l: [0, 0.3, -27] },
+    { p: [0, 0.5, -30.5], l: [0, 0.2, -37] },
+    { p: [0, 1.1, -40.0], l: [0, 0.6, -58] },
+    { p: [0, 1.4, -70.0], l: [0, 1.6, -82] }
+  ];
+  const camP = new THREE.Vector3(), camL = new THREE.Vector3();
+  function stationAt(f){
+    const x = Math.max(0, Math.min(5.999, f * 6));
+    const i = Math.floor(x), t = x - i;
+    const A = stations[i], B = stations[Math.min(i + 1, 6)];
+    camP.set(
+      A.p[0] + (B.p[0] - A.p[0]) * t,
+      A.p[1] + (B.p[1] - A.p[1]) * t,
+      A.p[2] + (B.p[2] - A.p[2]) * t
+    );
+    camL.set(
+      A.l[0] + (B.l[0] - A.l[0]) * t,
+      A.l[1] + (B.l[1] - A.l[1]) * t,
+      A.l[2] + (B.l[2] - A.l[2]) * t
+    );
   }
-  const cvs = renderer.domElement;
-  cvs.addEventListener('pointerdown', (e) => {
-    dragging = true; lastPX = e.clientX; downX = e.clientX; downY = e.clientY;
-    dragVel = 0; cvs.style.cursor = 'grabbing';
+
+  /* GSAP scrub: scroll drives progress; loop eases toward it. */
+  let target = 0;
+  ScrollTrigger.create({
+    trigger: '#journey', start: 'top top', end: 'bottom bottom',
+    scrub: 0.6,
+    onUpdate: (self) => { target = self.progress; }
   });
+
+  let mx = 0, my = 0, tx = 0, ty = 0;
   window.addEventListener('pointermove', (e) => {
     tx = (e.clientX / window.innerWidth - 0.5) * 2;
     ty = (e.clientY / window.innerHeight - 0.5) * 2;
-    if (dragging) {
-      const dx = e.clientX - lastPX;
-      lastPX = e.clientX;
-      dragVel = dx * 0.004;
-      group.rotation.y += dragVel;
-    }
-  }, { passive: true });
-  window.addEventListener('pointerup', (e) => {
-    if (!dragging) return;
-    dragging = false;
-    cvs.style.cursor = 'grab';
-    const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
-    if (moved < 6) {
-      const hit = pickLetter(e.clientX, e.clientY);
-      if (hit && hit.userData.hex) {
-        window.__chamberFocusHex(hit.userData.hex);
-        const bar = document.getElementById('inspectBar');
-        if (bar) {
-          bar.innerHTML = 'LETTER <b>' + hit.userData.char + '</b> · HEX <b>' + hit.userData.hex + '</b>';
-          bar.classList.add('show');
-          clearTimeout(window.__inspectT);
-          window.__inspectT = setTimeout(() => bar.classList.remove('show'), 2600);
-        }
-      }
-    }
-  });
-  window.addEventListener('mousemove', (e) => {
-    if (dragging) return;
-    const hit = pickLetter(e.clientX, e.clientY);
-    cvs.style.cursor = hit ? 'pointer' : 'grab';
   }, { passive: true });
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) clock.getDelta();
+  });
 
   const clock = new THREE.Clock();
-  let frames = 0, lastFps = performance.now();
+  let prog = 0, frames = 0, lastFps = performance.now(), firstFrame = true;
+  const amber = new THREE.Color(0xE8B84B), cyan = new THREE.Color(0x7FDCD0);
   (function loop(){
     requestAnimationFrame(loop);
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
-    mx += (tx - mx) * 0.035;
-    my += (ty - my) * 0.035;
-    if (!dragging && Math.abs(dragVel) > 0.0002) {
-      group.rotation.y += dragVel;
-      dragVel *= 0.95;
-    }
-    chapterMix += (chapterTarget - chapterMix) * 0.03;
-    const doc = document.documentElement;
-    const prog = doc.scrollHeight > window.innerHeight
-      ? window.scrollY / (doc.scrollHeight - window.innerHeight) : 0;
-    if (!dragging) group.rotation.y += 0.0009;
-    group.rotation.x = my * 0.1;
-    shells.forEach((s, i) => {
-      s.rotation.x += s.userData.spin;
-      s.rotation.y += s.userData.spin * 1.3;
-    });
-    if (morphT < 1) {
-      morphT = Math.min(morphT + dt * 0.7, 1);
-      const e = 1 - Math.pow(1 - morphT, 3);
-      for (let i = 0; i < COUNT * 3; i++) {
-        const prev = cur[i];
-        cur[i] = from[i] + (to[i] - from[i]) * e;
-        const sp = Math.min(Math.abs(cur[i] - prev) * 40, 1);
-        mixC.copy(sage).lerp(amber, sp);
-        col[i * 3] = mixC.r; col[i * 3 + 1] = mixC.g; col[i * 3 + 2] = mixC.b;
-      }
-      pGeo.attributes.position.needsUpdate = true;
-      pGeo.attributes.color.needsUpdate = true;
-    }
-    cloud.rotation.y = t * 0.02 + chapterMix * 1.5;
-    camera.position.x = mx * 1.2;
-    camera.position.y = 0.4 - my * 0.8 + prog * 1.0;
-    camera.lookAt(0, prog * 0.8 - 0.3, -1);
-    if (focusTimer > 0) focusTimer--;
-    else focusedHex = null;
-    letters.forEach((m, i) => {
-      const want = (focusedHex && m.userData.hex === focusedHex) ? 1.22 : 1.0;
-      m.scale.setScalar(m.scale.x + (want - m.scale.x) * 0.1);
-      m.position.y = m.userData.baseY + Math.sin(t * 0.55 + m.userData.phase) * 0.16;
-      m.rotation.y = -0.18 + Math.sin(t * 0.3 + m.userData.phase) * 0.06;
-    });
-    dust.rotation.y = t * 0.01;
+    prog += (target - prog) * Math.min(dt * 3.2, 1);
+    mx += (tx - mx) * 0.04;
+    my += (ty - my) * 0.04;
+
+    stationAt(prog);
+    camera.position.set(camP.x + mx * 0.7, camP.y - my * 0.45, camP.z);
+    camera.lookAt(camL.x + mx * 0.9, camL.y - my * 0.5, camL.z);
+
+    /* CH1 heartbeat. */
+    const beat = Math.pow(Math.max(Math.sin(t * 2.6), 0), 6);
+    heart.intensity = 1.4 + beat * 3.2;
+    core.material.opacity = 0.55 + beat * 0.45;
+    core.scale.setScalar(1 + beat * 0.25);
+    jar.rotation.y = t * 0.12;
+
+    /* CH2 wall scan + ejecta. */
+    const scan = (Math.sin(t * 0.5) * 0.5 + 0.5) * 10 - 5;
+    wall.position.x = Math.sin(t * 0.18) * 0.35;
+    lampCyan.position.set(scan, 1.5, -4);
+    lampCyan.intensity = 2 + Math.sin(t * 2.2) * 0.8;
+    const ej = Math.max(0, Math.min((prog - 0.16) / 0.1, 1)) * (1 - Math.max(0, Math.min((prog - 0.3) / 0.08, 1)));
+    ejecta.visible = ej > 0.01;
+    ejecta.position.set(0, 0.4 + ej * 0.4, -7 + ej * 5.2);
+    ejecta.rotation.y = t * 2;
+    ejecta.material.emissiveIntensity = 1.2 + ej * 2.5;
+    flood.position.set(0, 0.6, -2.5);
+    flood.intensity = ej * 14;
+    flood.color.copy(amber).lerp(cyan, Math.max(0, 1 - ej * 2));
+
+    /* CH3 type rotation + lamp. */
+    bigA.rotation.y = Math.sin(t * 0.22) * 0.5;
+    caliper.rotation.z = t * 0.1;
+    lampBrass.position.set(Math.sin(t * 0.4) * 4, 3, -15);
+    lampBrass.intensity = 4 + Math.sin(t * 1.1) * 1.2;
+
+    /* CH4 reaction. */
+    const rw = Math.max(0, Math.min((prog - 0.44) / 0.1, 1));
+    const orb = 2.4 * (1 - rw) + 0.001;
+    orbA.position.set(Math.cos(t * 1.6) * orb, 0.3 + Math.sin(t * 2.1) * 0.25 * (1 - rw), 0);
+    orbB.position.set(-Math.cos(t * 1.6) * orb, 0.3 - Math.sin(t * 2.1) * 0.25 * (1 - rw), 0);
+    const merged = rw >= 1 ? Math.min((prog - 0.54) / 0.04, 1) : 0;
+    orbA.visible = orbB.visible = merged < 1;
+    flash.intensity = merged > 0 && merged < 1 ? (1 - merged) * 60 * merged * 4 : 0;
+    shock.material.opacity = merged > 0 && merged < 1 ? (1 - merged) * 0.9 : 0;
+    shock.scale.setScalar(0.5 + merged * 5);
+    lampAmber.position.set(0, 1.5, -26);
+    lampAmber.intensity = 2 + rw * 6 + (merged > 0 && merged < 1 ? 20 * (1 - merged) : 0);
+
+    /* CH5 case. */
+    caseGroup.rotation.y = Math.sin(t * 0.25) * 0.35;
+    caseLamp.intensity = 7 + Math.sin(t * 1.4) * 1.5;
+
+    /* CH6 archive shimmer. */
+    archWins.material.emissiveIntensity = 0.7 + Math.sin(t * 0.9) * 0.35;
+
+    /* CH7 door breath. */
+    doorGlow.intensity = 26 + Math.sin(t * 1.2) * 8;
+    door.material.opacity = 0.9 + Math.sin(t * 1.2) * 0.08;
+
+    dust.rotation.y = t * 0.008;
     renderer.render(scene, camera);
+    if (firstFrame) {
+      firstFrame = false;
+      if (window.__labProgress) window.__labProgress(1);
+    }
     frames++;
     const now = performance.now();
-    if (now - lastFps > 1000) {
-      if (fpsEl) fpsEl.textContent = 'CHAMBER ' + Math.round(frames * 1000 / (now - lastFps)) + ' FPS';
-      frames = 0; lastFps = now;
-    }
+    if (now - lastFps > 2000) { frames = 0; lastFps = now; }
   })();
+
+  if (window.__labProgress) window.__labProgress(0.8);
 } catch (err) {
-  if (fpsEl) fpsEl.textContent = 'CHAMBER OFF';
+  document.body.classList.add('reduced');
+  document.querySelectorAll('.chapter').forEach((c) => c.classList.add('lit'));
+  if (window.__labFinish) window.__labFinish();
 }
 </script>
 </body>
