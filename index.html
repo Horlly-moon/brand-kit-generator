@@ -694,6 +694,15 @@ const folder = document.getElementById('folder');
 const featuredKit = document.getElementById('featuredKit');
 const sampleMeta = document.getElementById('sampleMeta');
 const reshuffleBtn = document.getElementById('reshuffleBtn');
+let sampleIndex = 0;
+let liveKits = [];
+function nextInRotation(pool){
+  if (!pool.length) return null;
+  sampleIndex = sampleIndex % pool.length;
+  const kit = pool[sampleIndex];
+  sampleIndex = (sampleIndex + 1) % pool.length;
+  return kit;
+}
 function renderSample(kit, source){
   const pal = Array.isArray(kit.palette) ? kit.palette : [];
   featuredKit.innerHTML = `
@@ -714,6 +723,7 @@ function replayFolder(){
   folder.classList.add('open');
 }
 renderSample(FALLBACK_KITS[0], 'local sample');
+sampleIndex = 1;
 if ('IntersectionObserver' in window) {
   const folderObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -739,9 +749,12 @@ reshuffleBtn.addEventListener('click', async () => {
     const data = await res.json();
     const kits = Array.isArray(data.kits) ? data.kits.filter((k) => k && k.id && Array.isArray(k.palette) && k.palette.length) : [];
     if (!kits.length) throw new Error('empty log');
-    renderSample(kits[Math.floor(Math.random() * kits.length)], 'live log');
+    liveKits = kits;
+    sampleIndex = sampleIndex % liveKits.length;
+    renderSample(nextInRotation(liveKits), 'live log');
   } catch (err) {
-    renderSample(FALLBACK_KITS[Math.floor(Math.random() * FALLBACK_KITS.length)], 'local sample (log unreachable)');
+    liveKits = [];
+    renderSample(nextInRotation(FALLBACK_KITS), 'local sample (log unreachable)');
   } finally {
     clearTimeout(timer);
     replayFolder();
