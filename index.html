@@ -7,29 +7,16 @@
 <meta name="description" content="Describe your brand. Get a palette, type pairing, and rationale in about two minutes. Real Google Fonts, measured accessibility.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Baloo+2:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#101214;
-    --paper-2:#181C1F;
-    --ink:#EEEFEA;
-    --ink-soft:#A7ACA6;
-    --accent:#F5A623;
-    --sage:#8B9474;
-    --line:#2A3034;
-    --card:#181C1F;
-    --glow:rgba(245,166,35,0.14);
-    --radius:2px;
+    --paper:#101214; --paper-2:#181C1F; --ink:#EEEFEA; --ink-soft:#A7ACA6;
+    --accent:#F5A623; --sage:#8B9474; --line:#2A3034; --card:rgba(24,28,31,0.78);
+    --glow:rgba(245,166,35,0.14); --radius:2px;
   }
   [data-theme="light"]{
-    --paper:#EEEFEA;
-    --paper-2:#E4E5DE;
-    --ink:#14171A;
-    --ink-soft:#4B4F51;
-    --accent:#B97A12;
-    --sage:#8B9474;
-    --line:#C9CAC2;
-    --card:#FBFAF7;
+    --paper:#EEEFEA; --paper-2:#E4E5DE; --ink:#14171A; --ink-soft:#4B4F51;
+    --accent:#B97A12; --sage:#8B9474; --line:#C9CAC2; --card:rgba(251,250,247,0.82);
     --glow:rgba(185,122,18,0.10);
   }
   *{box-sizing:border-box;}
@@ -39,12 +26,18 @@
   body{
     background:var(--paper); color:var(--ink);
     font-family:'IBM Plex Sans',sans-serif; font-size:16px; line-height:1.6;
-    -webkit-font-smoothing:antialiased; min-height:100vh;
+    -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden;
     transition:background .3s ease, color .3s ease;
   }
-  .wrap{max-width:none; margin:0; padding:0 5vw 90px;}
+  #chamber{position:fixed; inset:0; z-index:0;}
+  #chamber canvas{display:block;}
+  .vignette{position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.52) 100%);}
+  [data-theme="light"] .vignette{background:radial-gradient(ellipse at center, transparent 62%, rgba(20,23,26,.14) 100%);}
+  .grain{position:fixed; inset:0; z-index:3; pointer-events:none; opacity:.07;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
+  .wrap{max-width:none; margin:0; padding:0 5vw 90px; position:relative; z-index:2;}
 
-  /* Top bar */
   header.top{
     display:flex; justify-content:space-between; align-items:center;
     padding:16px 5vw; gap:14px; flex-wrap:wrap;
@@ -62,6 +55,9 @@
   }
   nav.main a:hover{color:var(--ink);}
   nav.main a .ch{color:var(--accent); margin-right:5px;}
+  nav.main .tc{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); letter-spacing:0.08em; display:flex; align-items:center; gap:7px;}
+  nav.main .tc i{width:8px; height:8px; border-radius:50%; background:#E5484D; animation:blink 1.6s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
 
   .btn{
     display:inline-block; background:var(--accent); color:#14171A;
@@ -70,7 +66,7 @@
     letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; cursor:pointer;
     transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
-  .btn:hover{transform:translateY(-2px); box-shadow:0 8px 24px var(--glow);}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 8px 28px var(--glow);}
   .btn.ghost{background:transparent; color:var(--ink); border-color:var(--line);}
   .btn.ghost:hover{border-color:var(--accent); color:var(--accent); box-shadow:none;}
   .theme-toggle{
@@ -82,170 +78,146 @@
   }
   .theme-toggle:hover{border-color:var(--accent); color:var(--ink);}
 
-  /* Index rail: edge tab dividers */
-  .rail{
-    position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:40;
-    display:flex; flex-direction:column; gap:6px;
-  }
+  /* Index rail */
+  .rail{position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:6px;}
   .rail a{
     font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
-    text-decoration:none; letter-spacing:0.06em;
-    background:var(--paper-2); border:1px solid var(--line); border-right:none;
-    border-radius:4px 0 0 4px; padding:10px 8px 10px 12px;
-    opacity:0.65; transition:opacity .2s ease, color .2s ease, padding .2s ease, background .2s ease;
+    text-decoration:none; letter-spacing:0.06em; background:var(--paper-2);
+    border:1px solid var(--line); border-right:none; border-radius:4px 0 0 4px;
+    padding:10px 8px 10px 12px; opacity:0.65;
+    transition:opacity .2s ease, color .2s ease, padding .2s ease, background .2s ease;
     display:flex; align-items:center; gap:8px;
   }
   .rail a:hover{opacity:1;}
   .rail a.active{opacity:1; color:var(--accent); background:var(--card); padding-left:20px;}
   .rail a b{font-weight:500;}
-  .rail .folio{
-    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft);
-    letter-spacing:0.08em; text-align:right; padding:8px 12px 0 0; opacity:0.7;
-  }
+  .rail .folio{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); letter-spacing:0.08em; text-align:right; padding:8px 12px 0 0; opacity:0.7;}
   @media (max-width:1100px){.rail{display:none;}}
 
-  /* Folio + page navigation */
-  .folio-line{
-    display:flex; justify-content:space-between; align-items:baseline;
-    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em;
-    text-transform:uppercase; color:var(--ink-soft); margin-bottom:14px;
-  }
-  .folio-line .pg{color:var(--accent);}
-  .page-nav{
-    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
-    margin-top:44px; padding-top:20px; border-top:1px solid var(--line);
-  }
-  .page-nav a{
-    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
-    text-transform:uppercase; color:var(--ink-soft); text-decoration:none;
-    transition:color .15s ease;
-  }
-  .page-nav a:hover{color:var(--accent);}
-  .page-nav a .ch{color:var(--accent); margin:0 6px;}
-
-  /* Dog-eared cards */
-  .dogear{position:relative;}
-  .dogear::after{
-    content:''; position:absolute; top:-1px; right:-1px; width:26px; height:26px;
-    background:linear-gradient(to bottom left, var(--paper) 0 49%, var(--line) 50%, var(--card) 51% 100%);
-    border-radius:0 var(--radius) 0 4px;
-    transition:width .25s ease, height .25s ease;
-  }
-  .dogear:hover::after{width:34px; height:34px;}
-
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em;
-    text-transform:uppercase; color:var(--accent); display:block; margin-bottom:16px;
-  }
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:16px;}
   section.chapter{padding:88px 0; border-bottom:1px solid var(--line); max-width:1240px;}
   section.chapter:last-of-type{border-bottom:none;}
   h2.ch-title{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(32px, 4vw, 48px); margin:0 0 16px; letter-spacing:-0.01em;}
   h2.ch-title .no{font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--ink-soft); vertical-align:super; letter-spacing:0.1em; margin-right:12px;}
   p.ch-sub{color:var(--ink-soft); font-size:17px; line-height:1.7; max-width:64ch; margin:0 0 40px;}
+  .folio-line{display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:14px;}
+  .folio-line .pg{color:var(--accent);}
+  .page-nav{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:44px; padding-top:20px; border-top:1px solid var(--line);}
+  .page-nav a{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); text-decoration:none; transition:color .15s ease;}
+  .page-nav a:hover{color:var(--accent);}
+  .page-nav a .ch{color:var(--accent); margin:0 6px;}
+
+  .card{background:var(--card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--line); border-radius:var(--radius);}
 
   /* Hero */
-  .hero{min-height:92vh; display:flex; flex-direction:column; justify-content:center; padding:40px 0 64px; max-width:1240px;}
-  .hero h1{
-    font-family:'Fraunces',serif; font-weight:500; font-size:clamp(56px, 8.5vw, 124px);
-    line-height:0.98; letter-spacing:-0.025em; margin:0 0 26px;
-    text-wrap:balance; max-width:11ch;
-  }
+  .hero{min-height:90vh; display:flex; flex-direction:column; justify-content:center; padding:40px 0 64px; max-width:1240px;}
+  .hero h1{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(56px, 8.5vw, 124px); line-height:0.98; letter-spacing:-0.025em; margin:0 0 26px; text-wrap:balance; max-width:11ch; text-shadow:0 4px 40px rgba(0,0,0,0.45);}
   .hero h1 em{font-style:italic; color:var(--accent);}
-  .hero p.lede{font-size:19px; line-height:1.7; color:var(--ink-soft); max-width:52ch; margin:0 0 34px;}
+  .hero p.lede{font-size:19px; line-height:1.7; color:var(--ink-soft); max-width:52ch; margin:0 0 34px; text-shadow:0 2px 18px rgba(0,0,0,0.5);}
   .hero-cta{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:34px;}
   .hero-stats{display:flex; gap:36px; flex-wrap:wrap;}
-  .stat .v{font-family:'Fraunces',serif; font-size:34px; font-weight:500; color:var(--ink);}
+  .stat .v{font-family:'Fraunces',serif; font-size:34px; font-weight:500;}
   .stat .v small{font-size:18px; color:var(--accent);}
   .stat .k{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-soft);}
 
-  /* Assembling kit */
-  .assemble{
-    margin-top:56px; background:var(--card); border:1px solid var(--line);
-    border-radius:var(--radius); padding:34px; max-width:860px; position:relative;
-    box-shadow:0 0 80px var(--glow);
+  /* Folder stage */
+  .folder-scene{perspective:1200px; max-width:640px; margin:8px 0 0;}
+  .folder{position:relative; height:380px; transform-style:preserve-3d;}
+  .folder-back{position:absolute; left:6%; right:6%; top:60px; bottom:0; background:var(--paper-2); border:1px solid var(--line); border-radius:6px 6px 4px 4px;}
+  .folder-tab{position:absolute; left:6%; top:34px; width:34%; height:30px; background:var(--paper-2); border:1px solid var(--line); border-bottom:none; border-radius:6px 10px 0 0;}
+  .folder-papers{position:absolute; inset:0; transform-style:preserve-3d;}
+  .folder-paper{
+    position:absolute; left:11%; right:11%; top:74px; background:var(--card);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; text-align:left;
+    opacity:0; transform:translateY(120px) rotate(-1.5deg);
+    transition:opacity .7s ease, transform .8s cubic-bezier(.2,.9,.25,1.15);
+    box-shadow:0 14px 30px rgba(0,0,0,0.35);
   }
-  .assemble .tag{
-    position:absolute; top:-13px; left:28px; background:var(--accent); color:#14171A;
-    font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:500;
-    letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border-radius:var(--radius);
+  .folder-paper.behind-1{transform:translateY(120px) rotate(2deg);}
+  .folder-paper.behind-2{transform:translateY(120px) rotate(-3.5deg);}
+  .folder.open .folder-paper{opacity:1; transform:translateY(-64px) rotate(-1.5deg);}
+  .folder.open .folder-paper.behind-1{transform:translateY(-34px) rotate(2deg); transition-delay:.12s;}
+  .folder.open .folder-paper.behind-2{transform:translateY(-8px) rotate(-3.5deg); transition-delay:.22s;}
+  .folder-paper h3{font-family:'Fraunces',serif; font-weight:500; font-size:24px; margin:0 0 10px;}
+  .folder-paper .dots{display:flex; gap:7px; margin-bottom:10px;}
+  .folder-paper .dots .dot{width:30px; height:30px; border-radius:50%; border:1px solid var(--line);}
+  .folder-paper .tl{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);}
+  .folder-paper .tl b{color:var(--ink); font-weight:500;}
+  .folder-front{
+    position:absolute; left:6%; right:6%; top:60px; bottom:0;
+    background:linear-gradient(180deg, var(--card), var(--paper-2));
+    border:1px solid var(--line); border-radius:6px 6px 4px 4px;
+    transform-origin:50% 100%; transition:transform .9s cubic-bezier(.6,0,.3,1);
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:26px;
   }
-  .asm-row{display:flex; gap:12px; margin:18px 0; flex-wrap:wrap;}
-  .asm-dot{width:64px; height:64px; border-radius:50%; border:1px solid var(--line);
-    opacity:0; transform:scale(.3); animation:pop .5s cubic-bezier(.2,.9,.3,1.4) forwards;}
-  .asm-type{opacity:0; transform:translateY(14px); animation:rise .6s ease forwards;}
-  .asm-line{opacity:0; animation:fadein .6s ease forwards;}
-  @keyframes pop{to{opacity:1; transform:none;}}
-  @keyframes rise{to{opacity:1; transform:none;}}
-  @keyframes fadein{to{opacity:1;}}
-  .asm-brand{font-size:34px; margin:6px 0 2px;}
-  .asm-sub{font-size:15px; color:var(--ink-soft); margin:0 0 4px;}
-  .asm-fonts{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
-  .asm-fonts b{color:var(--ink); font-weight:500;}
-  .stamp{
-    display:inline-block; border:2px solid var(--accent); color:var(--accent);
-    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:500;
-    letter-spacing:0.12em; text-transform:uppercase; padding:8px 16px; border-radius:3px;
-    transform:rotate(-4deg); margin-top:16px; opacity:0; animation:stampin .35s cubic-bezier(.2,1.4,.4,1) forwards;
-  }
-  @keyframes stampin{from{opacity:0; transform:rotate(-4deg) scale(1.6);} to{opacity:1; transform:rotate(-4deg) scale(1);}}
+  .folder-front span{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.3em; color:var(--ink-soft);}
+  .folder.open .folder-front{transform:rotateX(-72deg);}
+  .sample-actions{margin-top:26px; display:flex; gap:12px; flex-wrap:wrap;}
+  .sample-meta{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:14px; min-height:20px;}
+  @media (max-width:600px){.folder{height:420px;}}
 
   /* Specimen sheet */
-  .specimen{
-    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-    padding:40px; display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px;
-  }
+  .specimen{padding:40px; display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px;}
   @media (max-width:760px){.specimen{grid-template-columns:1fr; padding:28px;}}
-  .specimen .label{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase;
-    letter-spacing:0.1em; color:var(--accent); margin-bottom:12px;
-  }
+  .specimen .label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin-bottom:12px;}
   .specimen .glyphs{font-size:32px; line-height:1.4; word-break:break-all;}
   .specimen .nums{font-size:28px; line-height:1.55;}
   .weights div{border-bottom:1px solid var(--line); padding:10px 0; font-size:26px;}
   .weights div:last-child{border-bottom:none;}
-  .weights .w-light{font-weight:300;}
-  .weights .w-regular{font-weight:400;}
-  .weights .w-bold{font-weight:700;}
+  .weights .w-light{font-weight:300;} .weights .w-regular{font-weight:400;} .weights .w-bold{font-weight:700;}
 
-  /* Measure lab */
-  .lab-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:1000px;}
-  @media (max-width:760px){.lab-grid{grid-template-columns:1fr;}}
-  .meter{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:26px;}
-  .meter .reading{font-family:'Fraunces',serif; font-size:44px; font-weight:500; color:var(--ink);}
-  .meter .reading small{font-size:20px; color:var(--accent);}
-  .meter .cap{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-soft); margin-top:6px;}
-  .meter p{font-size:14.5px; line-height:1.7; color:var(--ink-soft); margin:12px 0 0;}
-  .meter p b{color:var(--ink);}
+  /* Tokens */
+  .tokens{display:grid; grid-template-columns:320px 1fr; gap:48px; max-width:1000px;}
+  @media (max-width:760px){.tokens{grid-template-columns:1fr; gap:32px;}}
+  .token-col h4{font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin:0 0 18px; font-weight:500;}
+  .token{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+  .token .sw{width:48px; height:48px; border:1px solid var(--line); border-radius:var(--radius); flex:none;}
+  .token .t-role{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; color:var(--ink-soft); letter-spacing:0.06em;}
+  .token .t-hex{font-family:'IBM Plex Mono',monospace; font-size:14px;}
+  .scale-row{border-bottom:1px solid var(--line); padding:12px 0;}
+  .scale-row:last-child{border-bottom:none;}
 
-  /* Contact sheets */
+  /* Steps */
+  .steps{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:1000px;}
+  @media (max-width:760px){.steps{grid-template-columns:1fr;}}
+  .step{padding:32px 28px; transition:transform .25s ease, border-color .25s ease;}
+  .step:hover{transform:translateY(-5px); border-color:var(--accent);}
+  .step .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent); letter-spacing:0.12em; display:block; margin-bottom:14px;}
+  .step h3{font-family:'Fraunces',serif; font-weight:500; font-size:23px; margin:0 0 12px;}
+  .step p{font-size:15px; line-height:1.7; color:var(--ink-soft); margin:0;}
+
+  /* Sheets */
   .sheets{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;}
   @media (max-width:900px){.sheets{grid-template-columns:1fr;}}
-  .sheet{
-    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-    padding:24px; transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-  }
-  .sheet:hover{transform:translateY(-5px); border-color:var(--accent); box-shadow:0 14px 34px rgba(0,0,0,0.35);}
+  .sheet{padding:24px; transition:transform .25s ease, border-color .25s ease;}
+  .sheet:hover{transform:translateY(-5px); border-color:var(--accent);}
   .sheet .frame{display:flex; gap:7px; margin-bottom:14px;}
-  .sheet .frame .dot{width:34px; height:34px; border-radius:50%; border:1px solid var(--line);}
+  .sheet .frame .dot{width:34px; height:34px; border-radius:50%; border:1px solid var(--line); transform:scale(.3); opacity:0; transition:transform .45s cubic-bezier(.2,.9,.3,1.4), opacity .3s ease;}
+  .sheet.in .frame .dot{transform:none; opacity:1;}
+  .sheet.in .frame .dot:nth-child(2){transition-delay:.07s;}
+  .sheet.in .frame .dot:nth-child(3){transition-delay:.14s;}
+  .sheet.in .frame .dot:nth-child(4){transition-delay:.21s;}
+  .sheet.in .frame .dot:nth-child(5){transition-delay:.28s;}
   .sheet h3{font-family:'Fraunces',serif; font-weight:500; font-size:24px; margin:0 0 4px;}
   .sheet .ind{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-bottom:12px;}
   .sheet .data{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); line-height:2; border-top:1px solid var(--line); padding-top:12px;}
   .sheet .data b{color:var(--accent); font-weight:500;}
   .sheet p{font-size:14.5px; line-height:1.7; color:var(--ink-soft); margin:12px 0 0;}
+  .sheet .ind, .sheet h3{opacity:0; transform:translateY(8px); transition:opacity .45s ease .1s, transform .45s ease .1s;}
+  .sheet.in .ind, .sheet.in h3{opacity:1; transform:none;}
+  .sheet .data, .sheet p{opacity:0; transform:translateY(10px); transition:opacity .5s ease .5s, transform .5s ease .5s;}
+  .sheet.in .data, .sheet.in p{opacity:1; transform:none;}
 
-  /* Steps */
-  .steps{display:grid; grid-template-columns:repeat(3, 1fr); gap:0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; max-width:1000px;}
-  @media (max-width:760px){.steps{grid-template-columns:1fr;}}
-  .step{background:var(--card); padding:32px 28px; border-right:1px solid var(--line); transition:background .25s ease;}
-  .step:last-child{border-right:none;}
-  @media (max-width:760px){.step{border-right:none; border-bottom:1px solid var(--line);}.step:last-child{border-bottom:none;}}
-  .step:hover{background:var(--paper-2);}
-  .step .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent); letter-spacing:0.12em; display:block; margin-bottom:14px;}
-  .step h3{font-family:'Fraunces',serif; font-weight:500; font-size:23px; margin:0 0 12px;}
-  .step p{font-size:15px; line-height:1.7; color:var(--ink-soft); margin:0;}
+  /* Claims */
+  .claims{display:grid; grid-template-columns:repeat(3, 1fr); gap:36px; max-width:1000px;}
+  @media (max-width:760px){.claims{grid-template-columns:1fr;}}
+  .claim h3{font-family:'Fraunces',serif; font-weight:500; font-size:22px; margin:0 0 12px;}
+  .claim p{font-size:15.5px; line-height:1.75; color:var(--ink-soft); margin:0;}
+  .claim b{color:var(--ink);}
 
   /* CTA */
-  .cta-block{margin-top:88px; border:1px solid var(--line); border-radius:var(--radius); padding:72px 56px; max-width:1000px; position:relative; overflow:hidden;}
+  .cta-block{margin-top:88px; padding:72px 56px; max-width:1000px; position:relative; overflow:hidden;}
   @media (max-width:600px){.cta-block{padding:52px 28px;}}
   .cta-block::before{content:''; position:absolute; inset:0; background:radial-gradient(600px 220px at 20% 0%, var(--glow), transparent 70%); pointer-events:none;}
   .cta-block h2{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(34px, 4.5vw, 54px); margin:0 0 16px; position:relative;}
@@ -254,14 +226,22 @@
   .cta-block .fine{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin:32px 0 0; position:relative;}
   .cta-block .fine a{color:inherit;}
 
-  footer.site{
-    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; max-width:1240px;
-    padding:28px 0 8px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);
-  }
+  footer.site{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; max-width:1240px; padding:28px 0 8px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
   footer.site a{color:var(--ink-soft); text-decoration:none;}
   footer.site a:hover{color:var(--ink);}
 
-  /* Scroll reveal + rule draw */
+  /* Inspect readout */
+  #inspectBar{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(80px); z-index:55;
+    background:var(--card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border:1px solid var(--accent); border-radius:var(--radius);
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.04em; color:var(--ink);
+    padding:10px 18px; opacity:0; transition:opacity .25s ease, transform .25s ease;
+    pointer-events:none; white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis;
+  }
+  #inspectBar.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  #inspectBar b{color:var(--accent); font-weight:500;}
+
   .reveal{opacity:0; transform:translateY(22px); transition:opacity .65s ease, transform .65s ease;}
   .reveal.in{opacity:1; transform:none;}
   .reveal[data-delay="1"]{transition-delay:.1s;}
@@ -278,20 +258,35 @@
     transition:opacity .25s ease, transform .25s ease;
   }
   #toTop.show{opacity:1; transform:none; pointer-events:auto;}
+  .dogear{position:relative;}
+  .dogear::after{
+    content:''; position:absolute; top:-1px; right:-1px; width:26px; height:26px;
+    background:linear-gradient(to bottom left, var(--paper) 0 49%, var(--line) 50%, var(--card) 51% 100%);
+    border-radius:0 var(--radius) 0 4px; transition:width .25s ease, height .25s ease;
+  }
+  .dogear:hover::after{width:34px; height:34px;}
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     .reveal,.rule{opacity:1; transform:none; transition:none;}
-    .asm-dot,.asm-type,.asm-line,.stamp{opacity:1; transform:none; animation:none;}
+    .sheet .frame .dot,.sheet .ind,.sheet h3,.sheet .data,.sheet p{opacity:1; transform:none; transition:none;}
+    .folder-paper{opacity:1; transform:none !important; transition:none;}
+    .folder-front{transform:none !important; transition:none;}
     *{transition:none !important;}
   }
 </style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
 </head>
 <body>
+<div id="chamber" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
 <nav class="rail" aria-label="Index">
   <a href="#brief" data-ch="brief"><b>01</b>Brief</a>
-  <a href="#proof" data-ch="proof"><b>02</b>Proof</a>
-  <a href="#measure" data-ch="measure"><b>03</b>Measure</a>
+  <a href="#sample" data-ch="sample"><b>02</b>Sample</a>
+  <a href="#proof" data-ch="proof"><b>03</b>Proof</a>
   <a href="#kits" data-ch="kits"><b>04</b>Kits</a>
   <a href="#begin" data-ch="begin"><b>05</b>Begin</a>
   <span class="folio" id="folioNow">p.01 / 05</span>
@@ -300,9 +295,10 @@
 <div class="wrap">
 
   <header class="top">
-    <a class="brandmark" href="#brief">Specimen<span>.</span><small>INDEX 2026</small></a>
+    <a class="brandmark" href="#brief">Specimen<span>.</span><small>CHAMBER 01</small></a>
     <nav class="main">
-      <a href="#proof"><span class="ch">02</span>Proof</a>
+      <span class="tc"><i></i><span id="timecode">00:00:00</span></span>
+      <a href="#proof"><span class="ch">03</span>Proof</a>
       <a href="#kits"><span class="ch">04</span>Kits</a>
       <a href="app/">Open the app</a>
       <a href="#" title="Accounts are coming soon">Sign in</a>
@@ -314,12 +310,12 @@
   <div class="hero" id="brief">
     <div>
       <div class="folio-line"><span>Chapter 01, Brief</span><span class="pg">p.01 / 05</span></div>
-      <span class="eyebrow">01 / Brief</span>
+      <span class="eyebrow">A working specimen, not a mockup</span>
       <h1>Brief in, <em>brand out.</em></h1>
-      <p class="lede">Describe your brand. In about two minutes you get a palette with named roles, a heading and body type pairing, and a written rationale. Generated, measured, and ready to refine.</p>
+      <p class="lede">Describe your brand. In about two minutes you get a palette with named roles, a heading and body type pairing, and a written rationale. Generated, measured, and ready to refine. The chamber around you is built from a real kit's five colors.</p>
       <div class="hero-cta">
         <a class="btn" href="app/">Create your first kit</a>
-        <a class="btn ghost" href="#proof">See the proof</a>
+        <a class="btn ghost" href="#sample">Open a sample</a>
       </div>
       <div class="hero-stats">
         <div class="stat"><div class="v"><span data-count="13.9" data-dec="1">0</span><small>:1</small></div><div class="k">Contrast, computed</div></div>
@@ -327,91 +323,70 @@
         <div class="stat"><div class="v"><span data-count="2">0</span><small>min</small></div><div class="k">Per kit</div></div>
       </div>
     </div>
-    <div class="assemble dogear" id="assemble">
-      <span class="tag">Live assembly, TestCo · fintech · v1</span>
-      <div class="asm-row" id="asmDots">
-        <span class="asm-dot" style="background:#1D4ED8; animation-delay:.15s"></span>
-        <span class="asm-dot" style="background:#0EA5E9; animation-delay:.29s"></span>
-        <span class="asm-dot" style="background:#F59E0B; animation-delay:.43s"></span>
-        <span class="asm-dot" style="background:#F8FAFC; animation-delay:.57s"></span>
-        <span class="asm-dot" style="background:#1E293B; animation-delay:.71s"></span>
-      </div>
-      <div class="asm-type" id="asmType" style="animation-delay:.9s">
-        <p class="asm-brand" style="font-family:'Oswald',sans-serif;">TestCo, set in Oswald</p>
-        <p class="asm-sub" style="font-family:'Inter',sans-serif;">Body copy set in Inter. The quick brown fox jumps over the lazy dog.</p>
-        <p class="asm-fonts">Heading: <b>Oswald</b> · Body: <b>Inter</b></p>
-      </div>
-      <div class="asm-line" id="asmStamp" style="animation-delay:1.5s"><span class="stamp">AA pass · 13.9:1</span></div>
-    </div>
+    <div class="page-nav" style="max-width:1240px;"><span></span><a href="#sample">Next <span class="ch">02</span> Sample &rarr;</a></div>
   </div>
 
-  <div class="page-nav" style="max-width:1240px;"><span></span><a href="#proof">Next <span class="ch">02</span> Proof &rarr;</a></div>
+  <!-- 02 SAMPLE -->
+  <section class="chapter reveal" id="sample">
+    <div class="folio-line"><span>Chapter 02, Sample</span><span class="pg">p.02 / 05</span></div>
+    <span class="eyebrow">Fresh from the logbook</span>
+    <h2 class="ch-title"><span class="no">02</span>Open a kit.</h2>
+    <p class="ch-sub">Every sample is a real generation. Hover the dots to inspect each part like a lens element, then generate another straight from the log. The chamber re-tints to match.</p>
+    <div class="folder-scene" style="margin:8px 0 0;">
+      <div class="folder" id="folder">
+        <div class="folder-tab"></div>
+        <div class="folder-back"></div>
+        <div class="folder-papers">
+          <div class="folder-paper behind-2"></div>
+          <div class="folder-paper behind-1"></div>
+          <div class="folder-paper" id="featuredKit"></div>
+        </div>
+        <div class="folder-front"><span>SPECIMEN</span></div>
+      </div>
+      <div class="sample-actions">
+        <button type="button" class="btn" id="reshuffleBtn">Generate a sample</button>
+      </div>
+      <p class="sample-meta" id="sampleMeta"></p>
+    </div>
+    <div class="page-nav" style="max-width:1240px;"><a href="#brief">&larr; Prev <span class="ch">01</span> Brief</a><a href="#proof">Next <span class="ch">03</span> Proof &rarr;</a></div>
+  </section>
 
-  <!-- 02 PROOF -->
+  <!-- 03 PROOF -->
   <section class="chapter reveal" id="proof">
-    <div class="folio-line"><span>Chapter 02, Proof</span><span class="pg">p.02 / 05</span></div>
-      <span class="eyebrow">02 / Proof</span>
-    <h2 class="ch-title"><span class="no">02</span>Every pairing, proved on the page.</h2>
+    <div class="folio-line"><span>Chapter 03, Proof</span><span class="pg">p.03 / 05</span></div>
+    <span class="eyebrow">The type tester</span>
+    <h2 class="ch-title"><span class="no">03</span>Every pairing, proved on the page.</h2>
     <p class="ch-sub">Specimen never names fonts from memory. It picks from Google's live catalog, then shows the actual faces at work: capitals, lowercase, numerals, weights.</p>
     <div class="rule" data-rule></div>
-    <div class="specimen" style="margin-top:36px;">
+    <div class="specimen card" style="margin-top:36px; max-width:1000px;">
       <div>
         <div class="label">Fraunces, uppercase and lowercase</div>
-        <div class="glyphs" style="font-family:'Fraunces',serif;">ABCDEFGHI<br>JKLMNOPQR<br>STUVWXYZ<br>abcdefgh<br>ijklmnopqr<br>stuvwxyz</div>
+        <div class="glyphs" style="font-family:'Fraunces',serif; font-size:32px; line-height:1.4; word-break:break-all;">ABCDEFGHI<br>JKLMNOPQR<br>STUVWXYZ<br>abcdefgh<br>ijklmnopqr<br>stuvwxyz</div>
       </div>
       <div>
         <div class="label">Fraunces, numerals and punctuation</div>
-        <div class="nums" style="font-family:'Fraunces',serif;">0123456789<br>!?&amp; .,:;(){} /<br>“ ” ‘ ’ +</div>
+        <div class="nums" style="font-family:'Fraunces',serif; font-size:28px; line-height:1.55;">0123456789<br>!?&amp; .,:;(){} /<br>“ ” ‘ ’ +</div>
         <div class="label" style="margin-top:22px;">Inter, weights</div>
         <div class="weights" style="font-family:'Inter',sans-serif;">
-          <div class="w-light">Light, trustworthy modern</div>
-          <div class="w-regular">Regular, trustworthy modern</div>
-          <div class="w-bold">Bold, trustworthy modern</div>
+          <div class="w-light" style="border-bottom:1px solid var(--line); padding:10px 0; font-size:26px; font-weight:300;">Light, trustworthy modern</div>
+          <div class="w-regular" style="border-bottom:1px solid var(--line); padding:10px 0; font-size:26px; font-weight:400;">Regular, trustworthy modern</div>
+          <div class="w-bold" style="padding:10px 0; font-size:26px; font-weight:700;">Bold, trustworthy modern</div>
         </div>
       </div>
     </div>
+    <div class="page-nav" style="max-width:1240px;"><a href="#sample">&larr; Prev <span class="ch">02</span> Sample</a><a href="#kits">Next <span class="ch">04</span> Kits &rarr;</a></div>
   </section>
-
-  <div class="page-nav" style="max-width:1240px;"><a href="#proof">&larr; Prev <span class="ch">02</span> Proof</a><a href="#measure">Next <span class="ch">03</span> Measure &rarr;</a></div>
-
-  <!-- 03 MEASURE -->
-  <section class="chapter reveal" id="measure">
-    <div class="folio-line"><span>Chapter 03, Measure</span><span class="pg">p.03 / 05</span></div>
-      <span class="eyebrow">03 / Measure</span>
-    <h2 class="ch-title"><span class="no">03</span>Every claim carries a reading.</h2>
-    <p class="ch-sub">The lab panel on one TestCo kit. Nothing here is adjectives. Contrast is calculated per WCAG with a 4.5:1 floor, fonts are drawn from about two thousand faces fetched at generation time, misses get a deterministic HSL auto-fix instead of a second AI call.</p>
-    <div class="rule" data-rule></div>
-    <div class="lab-grid" style="margin-top:36px;">
-      <div class="meter dogear reveal" data-delay="1">
-        <div class="reading"><span data-count="13.9" data-dec="1">0</span><small>:1</small></div>
-        <div class="cap">Text/bg contrast · AA PASS</div>
-        <p>Computed from relative luminance, not claimed. Floor is <b>4.5:1</b>.</p>
-      </div>
-      <div class="meter dogear reveal" data-delay="2">
-        <div class="reading"><span data-count="2000" data-plus="1">0</span><small>+</small></div>
-        <div class="cap">Catalog faces available</div>
-        <p>Both fonts must come from <b>Google Fonts live list</b>. Invented names are rejected.</p>
-      </div>
-      <div class="meter dogear reveal" data-delay="3">
-        <div class="reading"><span data-count="5">0</span><small>roles</small></div>
-        <div class="cap">Primary → Neutral/Text</div>
-        <p>Five colors, named roles, <b>60-30-10</b> balance where it fits the brief.</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="page-nav" style="max-width:1240px;"><a href="#measure">&larr; Prev <span class="ch">03</span> Measure</a><a href="#kits">Next <span class="ch">04</span> Kits &rarr;</a></div>
 
   <!-- 04 KITS -->
   <section class="chapter reveal" id="kits">
     <div class="folio-line"><span>Chapter 04, Kits</span><span class="pg">p.04 / 05</span></div>
-      <span class="eyebrow">04 / Kits</span>
-    <h2 class="ch-title"><span class="no">04</span>Contact sheets from the logbook.</h2>
-    <p class="ch-sub">Real generations across food, fintech, and logistics. Kits you make land in History, ready to reopen and refine.</p>
+    <span class="eyebrow">From the logbook</span>
+    <h2 class="ch-title"><span class="no">04</span>Contact sheets, real briefs.</h2>
+    <p class="ch-sub">Pulled from actual generations across food, fintech, and logistics. Hover any dot to inspect it. Kits you make land in History, ready to reopen.</p>
     <div class="rule" data-rule></div>
     <div class="sheets" style="margin-top:36px;">
-      <div class="sheet dogear reveal" data-delay="1">
-        <div class="frame">
+      <div class="sheet card dogear reveal" data-delay="1">
+        <div class="frame" data-kit="seedco">
           <span class="dot" style="background:#E63946"></span>
           <span class="dot" style="background:#F1FA8C"></span>
           <span class="dot" style="background:#FFB703"></span>
@@ -420,11 +395,11 @@
         </div>
         <h3 style="font-family:'Baloo 2',sans-serif;">SeedCo</h3>
         <div class="ind">Food · v1 · Baloo 2 / Nunito Sans</div>
-        <div class="data">CONTRAST <b>12.5:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b> · REFINES <b>0</b></div>
+        <div class="data">CONTRAST <b>12.5:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b></div>
         <p>Seed logo colors lead as primary and secondary, with a golden accent for appetite appeal on cream.</p>
       </div>
-      <div class="sheet dogear reveal" data-delay="2">
-        <div class="frame">
+      <div class="sheet card dogear reveal" data-delay="2">
+        <div class="frame" data-kit="testco">
           <span class="dot" style="background:#1D4ED8"></span>
           <span class="dot" style="background:#0EA5E9"></span>
           <span class="dot" style="background:#F59E0B"></span>
@@ -433,11 +408,11 @@
         </div>
         <h3 style="font-family:'Oswald',sans-serif;">TestCo</h3>
         <div class="ind">Fintech · v1 · Oswald / Inter</div>
-        <div class="data">CONTRAST <b>13.9:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b> · REFINES <b>2</b></div>
+        <div class="data">CONTRAST <b>13.9:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b></div>
         <p>Deep blue trust base with an amber energy accent. Red was explicitly avoided per the brief.</p>
       </div>
-      <div class="sheet dogear reveal" data-delay="3">
-        <div class="frame">
+      <div class="sheet card dogear reveal" data-delay="3">
+        <div class="frame" data-kit="supabasecheck">
           <span class="dot" style="background:#1A3A5C"></span>
           <span class="dot" style="background:#2E86AB"></span>
           <span class="dot" style="background:#27AE60"></span>
@@ -446,46 +421,20 @@
         </div>
         <h3 style="font-family:'Fraunces',serif;">SupabaseCheck</h3>
         <div class="ind">Logistics · v1 · Fraunces / Inter</div>
-        <div class="data">CONTRAST <b>13.9:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b> · REFINES <b>1</b></div>
+        <div class="data">CONTRAST <b>13.9:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b></div>
         <p>Navy stability with a growth green accent. Tradition set against forward motion.</p>
       </div>
     </div>
+    <div class="page-nav" style="max-width:1240px;"><a href="#proof">&larr; Prev <span class="ch">03</span> Proof</a><a href="#begin">Next <span class="ch">05</span> Begin &rarr;</a></div>
   </section>
-
-  <!-- PROCESS -->
-  <section class="chapter reveal" id="how">
-    <span class="eyebrow">Process</span>
-    <h2 class="ch-title">Describe. Generate. Refine.</h2>
-    <p class="ch-sub">Three steps, one continuous loop. Every iteration is versioned and logged to your history.</p>
-    <div class="rule" data-rule></div>
-    <div class="steps" style="margin-top:36px;">
-      <div class="step dogear reveal" data-delay="1">
-        <span class="num">01</span>
-        <h3>Describe</h3>
-        <p>Name, industry, mood, and colors to avoid, plus an optional logo. Logo colors are read in your browser and sent as seed tones. The image never leaves your machine.</p>
-      </div>
-      <div class="step dogear reveal" data-delay="2">
-        <span class="num">02</span>
-        <h3>Generate</h3>
-        <p>Your brief meets the live font catalog and real design constraints: 60-30-10 balance, color psychology, and a contrasting but readable pairing. A full kit returns in about two minutes.</p>
-      </div>
-      <div class="step dogear reveal" data-delay="3">
-        <span class="num">03</span>
-        <h3>Refine</h3>
-        <p>Nudge it in plain words. Try more playful or swap the accent. Only the requested change moves and everything else holds. Each version is logged to your history.</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="page-nav" style="max-width:1240px;"><a href="#kits">&larr; Prev <span class="ch">04</span> Kits</a><a href="#begin">Next <span class="ch">05</span> Begin &rarr;</a></div>
 
   <!-- 05 BEGIN -->
   <section class="chapter reveal" id="begin">
     <div class="folio-line"><span>Chapter 05, Begin</span><span class="pg">p.05 / 05</span></div>
-      <span class="eyebrow">05 / Begin</span>
+    <span class="eyebrow">Begin</span>
     <h2 class="ch-title"><span class="no">05</span>Set your first kit.</h2>
     <p class="ch-sub">Free while in the specimen stage. Takes about two minutes, and every version stays in your history.</p>
-    <div class="cta-block" style="margin-top:0;">
+    <div class="cta-block card" style="margin-top:0;">
       <span class="eyebrow">Index complete</span>
       <h2>Brief in, <em>brand out.</em></h2>
       <p>One form, one kit, infinite refines. Accounts are coming soon. Sign in will live here.</p>
@@ -496,11 +445,12 @@
 
   <footer class="site">
     <span>Specimen, a brand kit generator · Index 2026</span>
-    <span><a href="app/">App</a> · <a href="#">Sign in</a> · <a href="#brief">Top</a></span>
+    <span><a href="app/">App</a> · <a href="#">Sign in</a> · <a href="#brief">Top</a> · <span id="fpsFoot">CHAMBER -- FPS</span></span>
   </footer>
 
 </div>
 
+<div id="inspectBar" aria-live="polite"></div>
 <button type="button" id="toTop" aria-label="Back to top">↑</button>
 
 <script>
@@ -519,6 +469,7 @@ themeToggle.addEventListener('click', () => {
 function applyTheme(theme){
   document.documentElement.dataset.theme = theme;
   themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+  if (window.__chamberTheme) window.__chamberTheme(theme);
 }
 
 /* Reveals register first so content never gets stuck invisible. */
@@ -578,29 +529,167 @@ if ('IntersectionObserver' in window) {
   startCounters();
 }
 
-/* Index rail active state. */
+/* Index rail + folio readout. */
 if ('IntersectionObserver' in window) {
   const railLinks = Array.from(document.querySelectorAll('.rail a'));
   const byId = {};
   railLinks.forEach((a) => { byId[a.dataset.ch] = a; });
+  const order = ['brief', 'sample', 'proof', 'kits', 'begin'];
+  const folioNow = document.getElementById('folioNow');
   const secObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         railLinks.forEach((a) => a.classList.remove('active'));
         const link = byId[entry.target.id];
         if (link) link.classList.add('active');
-        const folioNow = document.getElementById('folioNow');
-        const order = ['brief', 'proof', 'measure', 'kits', 'begin'];
         const idx = order.indexOf(entry.target.id);
         if (folioNow && idx >= 0) folioNow.textContent = 'p.0' + (idx + 1) + ' / 05';
+        if (window.__chamberChapter) window.__chamberChapter(idx);
       }
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
-  ['brief', 'proof', 'measure', 'kits', 'begin'].forEach((id) => {
+  order.forEach((id) => {
     const s = document.getElementById(id);
     if (s) secObserver.observe(s);
   });
 }
+
+/* Folder reveal + live reshuffler. */
+const N8N_GALLERY = new URLSearchParams(location.search).get('gallery') || 'http://localhost:5678/webhook/brand-kits';
+const FALLBACK_KITS = [
+  { brand_name: 'TestCo', industry: 'fintech', version: 1,
+    palette: [{hex:'#1D4ED8',role:'Primary'},{hex:'#0EA5E9',role:'Secondary'},{hex:'#F59E0B',role:'Accent'},{hex:'#F8FAFC',role:'Background'},{hex:'#1E293B',role:'Neutral / Text'}],
+    fonts: { heading: 'Oswald', body: 'Inter' } },
+  { brand_name: 'SeedCo', industry: 'food', version: 1,
+    palette: [{hex:'#E63946',role:'Primary'},{hex:'#F1FA8C',role:'Secondary'},{hex:'#FFB703',role:'Accent'},{hex:'#FFF9F0',role:'Background'},{hex:'#3A2E2A',role:'Neutral / Text'}],
+    fonts: { heading: 'Baloo 2', body: 'Nunito Sans' } },
+  { brand_name: 'SupabaseCheck', industry: 'logistics', version: 1,
+    palette: [{hex:'#1A3A5C',role:'Primary'},{hex:'#2E86AB',role:'Secondary'},{hex:'#27AE60',role:'Accent'},{hex:'#F8FAFC',role:'Background'},{hex:'#212529',role:'Neutral / Text'}],
+    fonts: { heading: 'Fraunces', body: 'Inter' } }
+];
+function channelLum(h){
+  const c = parseInt(h.slice(1), 16);
+  const rgb = [(c >> 16) & 255, (c >> 8) & 255, c & 255].map((v) => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+}
+function contrastRatio(hexA, hexB){
+  const l1 = channelLum(hexA), l2 = channelLum(hexB);
+  const hi = Math.max(l1, l2), lo = Math.min(l1, l2);
+  return (hi + 0.05) / (lo + 0.05);
+}
+function kitContrast(kit){
+  const pal = Array.isArray(kit.palette) ? kit.palette : [];
+  const bg = pal.find((c) => /background/i.test(c.role || '')) || {};
+  const tx = pal.find((c) => /text|neutral/i.test(c.role || '')) || {};
+  if (!bg.hex || !tx.hex) return null;
+  return contrastRatio(tx.hex, bg.hex);
+}
+const folder = document.getElementById('folder');
+const featuredKit = document.getElementById('featuredKit');
+const sampleMeta = document.getElementById('sampleMeta');
+const reshuffleBtn = document.getElementById('reshuffleBtn');
+let sampleIndex = 0;
+function nextInRotation(pool){
+  if (!pool.length) return null;
+  sampleIndex = sampleIndex % pool.length;
+  const kit = pool[sampleIndex];
+  sampleIndex = (sampleIndex + 1) % pool.length;
+  return kit;
+}
+function renderSample(kit, source){
+  const pal = Array.isArray(kit.palette) ? kit.palette : [];
+  featuredKit.innerHTML =
+    '<h3 style="font-family:\'' + escapeHtml((kit.fonts && kit.fonts.heading) || 'Fraunces') + '\',serif;">' + escapeHtml(kit.brand_name || 'Untitled') + '</h3>' +
+    '<div class="dots">' + pal.map((c) => '<span class="dot" data-role="' + escapeHtml(c.role || '') + '" data-hex="' + escapeHtml(c.hex || '') + '" style="background:' + escapeHtml(c.hex || '#ccc') + '" title="' + escapeHtml((c.role || '') + ' ' + (c.hex || '')) + '"></span>').join('') + '</div>' +
+    '<div class="tl"><b>' + escapeHtml((kit.fonts && kit.fonts.heading) || '') + '</b> with ' + escapeHtml((kit.fonts && kit.fonts.body) || '') + '</div>';
+  featuredKit.querySelectorAll('.dot').forEach((d) => {
+    d.addEventListener('mouseenter', () => inspectPart(d.dataset.role, d.dataset.hex, kit));
+  });
+  const ratio = kitContrast(kit);
+  sampleMeta.textContent =
+    (kit.brand_name || 'Untitled') + ' · ' + (kit.industry || 'unspecified') +
+    ' · v' + (kit.version || 1) + ' · ' + ((kit.fonts && kit.fonts.heading) || '') +
+    ' / ' + ((kit.fonts && kit.fonts.body) || '') +
+    (ratio ? ' · contrast ' + ratio.toFixed(1) + ':1 computed' : '') +
+    ' · via ' + source;
+  if (window.__chamberKit) window.__chamberKit(pal.map((c) => c.hex).filter(Boolean));
+}
+function replayFolder(){
+  folder.classList.remove('open');
+  void folder.offsetWidth;
+  folder.classList.add('open');
+}
+renderSample(FALLBACK_KITS[0], 'local sample');
+sampleIndex = 1;
+if ('IntersectionObserver' in window) {
+  const folderObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        folder.classList.add('open');
+        folderObserver.unobserve(folder);
+      }
+    });
+  }, { threshold: 0.35 });
+  folderObserver.observe(folder);
+} else {
+  folder.classList.add('open');
+}
+reshuffleBtn.addEventListener('click', async () => {
+  reshuffleBtn.disabled = true;
+  reshuffleBtn.textContent = 'Pulling from the log…';
+  sampleMeta.textContent = 'Asking the logbook for a kit…';
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(N8N_GALLERY + '?action=list&t=' + Date.now(), { signal: controller.signal });
+    if (!res.ok) throw new Error('status ' + res.status);
+    const data = await res.json();
+    const kits = Array.isArray(data.kits) ? data.kits.filter((k) => k && k.id && Array.isArray(k.palette) && k.palette.length) : [];
+    if (!kits.length) throw new Error('empty log');
+    renderSample(nextInRotation(kits), 'live log');
+  } catch (err) {
+    renderSample(nextInRotation(FALLBACK_KITS), 'local sample (log unreachable)');
+  } finally {
+    clearTimeout(timer);
+    replayFolder();
+    reshuffleBtn.disabled = false;
+    reshuffleBtn.textContent = 'Generate a sample';
+  }
+});
+
+/* Global inspect readout for every swatch on the page. */
+const inspectBar = document.getElementById('inspectBar');
+let inspectTimer = null;
+function inspectPart(role, hex, kit){
+  if (!hex) return;
+  const pal = Array.isArray(kit.palette) ? kit.palette : [];
+  const bg = (pal.find((c) => /background/i.test(c.role || '')) || {}).hex || '#F8FAFC';
+  const tx = (pal.find((c) => /text|neutral/i.test(c.role || '')) || {}).hex || '#1E293B';
+  let rBg = '-', rTx = '-';
+  try {
+    rBg = contrastRatio(hex, bg).toFixed(1);
+    rTx = contrastRatio(hex, tx).toFixed(1);
+  } catch (e) {}
+  inspectBar.innerHTML = 'PART <b>' + escapeHtml(role || 'swatch') + '</b> · HEX <b>' + escapeHtml(hex) +
+    '</b> · VS BG <b>' + rBg + ':1</b> · VS TEXT <b>' + rTx + ':1</b>';
+  inspectBar.classList.add('show');
+  clearTimeout(inspectTimer);
+  inspectTimer = setTimeout(() => inspectBar.classList.remove('show'), 2600);
+  if (window.__chamberFocusHex) window.__chamberFocusHex(hex);
+}
+document.querySelectorAll('.sheet .frame .dot').forEach((d) => {
+  d.addEventListener('mouseenter', () => {
+    const card = d.closest('.sheet');
+    const name = card ? card.querySelector('h3').textContent : '';
+    const kit = FALLBACK_KITS.find((k) => k.brand_name === name) || FALLBACK_KITS[0];
+    const idx = Array.from(d.parentNode.children).indexOf(d);
+    const part = (kit.palette && kit.palette[idx]) || {};
+    inspectPart(part.role, part.hex, kit);
+  });
+});
 
 const toTop = document.getElementById('toTop');
 window.addEventListener('scroll', () => {
@@ -609,6 +698,163 @@ window.addEventListener('scroll', () => {
 toTop.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+
+/* Timecode */
+const tcEl = document.querySelector('nav.main .tc');
+if (tcEl) {
+  const t0 = Date.now();
+  setInterval(() => {
+    const s = Math.floor((Date.now() - t0) / 1000);
+    const p = (n) => String(n).padStart(2, '0');
+    const label = tcEl.querySelector('span:last-child');
+    if (label) label.textContent = p(Math.floor(s / 3600)) + ':' + p(Math.floor(s / 60) % 60) + ':' + p(s % 60);
+  }, 500);
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fpsEl = document.getElementById('fpsFoot');
+let themeIsDark = document.documentElement.dataset.theme !== 'light';
+
+if (reduceMotion || !window.WebGLRenderingContext) {
+  if (fpsEl) fpsEl.textContent = 'CHAMBER OFF';
+} else try {
+  const host = document.getElementById('chamber');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  host.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x101214, 0.05);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0.6, 11);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const key = new THREE.DirectionalLight(0xfff2df, 1.6);
+  key.position.set(5, 8, 6);
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0xF5A623, 1.1);
+  rim.position.set(-6, -3, -4);
+  scene.add(rim);
+
+  const group = new THREE.Group();
+  scene.add(group);
+  const geos = [
+    new THREE.BoxGeometry(1.5, 1.5, 1.5),
+    new THREE.OctahedronGeometry(1.15),
+    new THREE.TetrahedronGeometry(1.35),
+    new THREE.IcosahedronGeometry(1.0),
+    new THREE.TorusKnotGeometry(0.75, 0.24, 120, 16)
+  ];
+  const solids = [];
+  function buildKit(hexes){
+    while (group.children.length) {
+      const c = group.children.pop();
+      group.remove(c);
+    }
+    solids.length = 0;
+    hexes.forEach((hex, i) => {
+      const mat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(hex), roughness: 0.25, metalness: 0.55,
+        transparent: true, opacity: 0.92, emissive: new THREE.Color(hex), emissiveIntensity: 0.18
+      });
+      const m = new THREE.Mesh(geos[i % geos.length], mat);
+      const a = (i / hexes.length) * Math.PI * 2;
+      m.position.set(Math.cos(a) * 3.4, (i % 2 ? 0.9 : -0.9) + (i - 2) * 0.22, Math.sin(a) * 1.6 - 1);
+      m.rotation.set(i * 0.7, i * 1.1, 0);
+      m.userData.spin = 0.12 + (i * 0.07);
+      m.userData.hex = hex.toUpperCase();
+      m.userData.base = 1.0;
+      group.add(m);
+      solids.push(m);
+      const wire = new THREE.Mesh(
+        geos[i % geos.length],
+        new THREE.MeshBasicMaterial({ color: 0xF5A623, wireframe: true, transparent: true, opacity: 0.10 })
+      );
+      wire.position.copy(m.position);
+      wire.userData.spin = -m.userData.spin * 0.6;
+      wire.userData.hex = hex.toUpperCase();
+      wire.userData.base = 1.6;
+      wire.scale.setScalar(1.6);
+      group.add(wire);
+      solids.push(wire);
+    });
+  }
+  buildKit(['#1D4ED8', '#0EA5E9', '#F59E0B', '#F8FAFC', '#1E293B']);
+
+  const pGeo = new THREE.BufferGeometry();
+  const pCount = 420, pos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * 26;
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 16;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const dust = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x8B9474, size: 0.035, transparent: true, opacity: 0.7 }));
+  scene.add(dust);
+
+  let mx = 0, my = 0, tx = 0, ty = 0, focusedHex = null, focusTimer = 0, chapterMix = 0, chapterTarget = 0;
+  window.__chamberFocusHex = (hex) => { focusedHex = (hex || '').toUpperCase(); focusTimer = 140; };
+  window.__chamberKit = (hexes) => { if (Array.isArray(hexes) && hexes.length >= 3) buildKit(hexes.slice(0, 5)); };
+  window.__chamberChapter = (idx) => { chapterTarget = idx < 0 ? 0 : (idx % 5) / 4; };
+  window.__chamberTheme = (theme) => {
+    themeIsDark = theme !== 'light';
+    scene.fog.color.set(themeIsDark ? 0x101214 : 0xEEEFEA);
+  };
+  if (!themeIsDark) scene.fog.color.set(0xEEEFEA);
+  window.addEventListener('mousemove', (e) => {
+    tx = (e.clientX / window.innerWidth - 0.5) * 2;
+    ty = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  const clock = new THREE.Clock();
+  let frames = 0, lastFps = performance.now();
+  (function loop(){
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    mx += (tx - mx) * 0.04;
+    my += (ty - my) * 0.04;
+    chapterMix += (chapterTarget - chapterMix) * 0.03;
+    const doc = document.documentElement;
+    const prog = doc.scrollHeight > window.innerHeight
+      ? window.scrollY / (doc.scrollHeight - window.innerHeight) : 0;
+    group.rotation.y = prog * Math.PI * 2 + chapterMix * 1.2 + t * 0.03;
+    group.rotation.x = my * 0.12;
+    camera.position.x = mx * 1.4;
+    camera.position.y = 0.6 - my * 0.9 + prog * 1.2;
+    camera.lookAt(0, prog * 1.0 - 0.4, -1);
+    if (focusTimer > 0) focusTimer--;
+    else focusedHex = null;
+    solids.forEach((m, i) => {
+      const sp = m.userData.spin || 0.2;
+      m.rotation.x += 0.0016 * sp * 10 * 0.1;
+      m.rotation.y += 0.0022 * sp * 10 * 0.1;
+      const base = m.userData.base || 1;
+      const want = base * ((focusedHex && m.userData.hex === focusedHex) ? 1.3 : 1);
+      m.scale.setScalar(m.scale.x + (want - m.scale.x) * 0.12);
+      m.position.y += Math.sin(t * 0.7 + i * 1.3) * 0.0016;
+    });
+    dust.rotation.y = t * 0.014;
+    renderer.render(scene, camera);
+    frames++;
+    const now = performance.now();
+    if (now - lastFps > 1000) {
+      if (fpsEl) fpsEl.textContent = 'CHAMBER ' + Math.round(frames * 1000 / (now - lastFps)) + ' FPS';
+      frames = 0; lastFps = now;
+    }
+  })();
+} catch (err) {
+  if (fpsEl) fpsEl.textContent = 'CHAMBER OFF';
+}
 </script>
 </body>
 </html>
