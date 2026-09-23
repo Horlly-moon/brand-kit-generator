@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specimen Lab: viewfinder prototype</title>
+<meta name="description" content="Prototype: a brand kit inspected through a viewfinder, floating in a 3D specimen chamber.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Oswald:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#101214; --paper-2:#181C1F; --ink:#EEEFEA; --ink-soft:#A7ACA6;
+    --accent:#F5A623; --line:#2A3034; --card:#181C1F; --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans',sans-serif; min-height:100vh; overflow-x:hidden;}
+  #chamber{position:fixed; inset:0; z-index:0;}
+  #chamber canvas{display:block;}
+  .vignette{position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,.5) 100%);}
+  .grain{position:fixed; inset:0; z-index:3; pointer-events:none; opacity:.07;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
+
+  .finder{position:relative; z-index:2; min-height:100vh; display:flex; flex-direction:column; padding:0 5vw 40px;}
+  .hud-top{display:flex; justify-content:space-between; align-items:center; padding:20px 0;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.1em; color:var(--ink-soft);}
+  .hud-top .rec{display:flex; align-items:center; gap:8px; color:var(--ink);}
+  .hud-top .rec i{width:9px; height:9px; border-radius:50%; background:#E5484D; animation:blink 1.6s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+  .hud-top a{color:var(--ink-soft); text-decoration:none;}
+  .hud-top a:hover{color:var(--ink);}
+
+  .stage{flex:1; display:grid; grid-template-columns:1fr 380px; gap:48px; align-items:center; padding:24px 0 40px;}
+  @media (max-width:900px){.stage{grid-template-columns:1fr;}}
+  .headline .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:16px;}
+  .headline h1{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(48px, 7vw, 104px); line-height:0.98; letter-spacing:-0.025em; margin:0 0 24px; text-wrap:balance;}
+  .headline h1 em{font-style:italic; color:var(--accent);}
+  .headline p{font-size:18px; line-height:1.7; color:var(--ink-soft); max-width:48ch; margin:0 0 32px;}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap;}
+  .btn{display:inline-block; background:var(--accent); color:#14171A; border:1px solid var(--accent); border-radius:var(--radius);
+    padding:14px 28px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500; letter-spacing:0.08em;
+    text-transform:uppercase; text-decoration:none; transition:transform .2s ease, box-shadow .2s ease;}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 8px 28px rgba(245,166,35,0.25);}
+  .btn.ghost{background:transparent; color:var(--ink); border-color:var(--line);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); box-shadow:none;}
+
+  /* Specimen card under inspection */
+  .specimen{
+    background:rgba(24,28,31,0.82); backdrop-filter:blur(10px);
+    border:1px solid var(--line); border-radius:var(--radius); padding:28px; position:relative;
+    box-shadow:0 24px 70px rgba(0,0,0,0.5);
+  }
+  .corner{position:absolute; width:22px; height:22px; border:2px solid var(--accent);}
+  .corner.tl{top:-2px; left:-2px; border-right:none; border-bottom:none;}
+  .corner.tr{top:-2px; right:-2px; border-left:none; border-bottom:none;}
+  .corner.bl{bottom:-2px; left:-2px; border-right:none; border-top:none;}
+  .corner.br{bottom:-2px; right:-2px; border-left:none; border-top:none;}
+  .specimen .meta{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em; color:var(--ink-soft);
+    display:flex; justify-content:space-between; margin-bottom:16px; text-transform:uppercase;}
+  .specimen .dots{display:flex; gap:9px; margin-bottom:18px;}
+  .specimen .dots .dot{width:44px; height:44px; border-radius:50%; border:1px solid var(--line); cursor:pointer; transition:transform .2s ease;}
+  .specimen .dots .dot:hover{transform:scale(1.18);}
+  .specimen .dots .dot.sel{outline:2px solid var(--accent); outline-offset:3px;}
+  .specimen h2{font-size:30px; margin:0 0 4px; font-weight:500;}
+  .specimen .sub{font-size:14px; color:var(--ink-soft); margin:0 0 14px;}
+  .specimen .fonts{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
+  .specimen .fonts b{color:var(--ink);}
+  .inspect{
+    margin-top:18px; border-top:1px dashed var(--line); padding-top:14px;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:2; color:var(--ink-soft); min-height:92px;
+  }
+  .inspect b{color:var(--accent); font-weight:500;}
+  .stamp{
+    display:inline-block; border:2px solid var(--accent); color:var(--accent);
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:500;
+    letter-spacing:0.12em; padding:7px 14px; border-radius:3px; transform:rotate(-4deg); margin-top:14px;
+  }
+  .hud-bottom{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:0.1em; color:var(--ink-soft); padding:14px 0 0;}
+  .fallback-note{display:none; text-align:center; padding:60px 20px; color:var(--ink-soft); position:relative; z-index:2;}
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+</head>
+<body>
+<div id="chamber" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="finder" id="finder">
+  <div class="hud-top">
+    <span class="rec"><i></i> SPECIMEN · KIT 01 · <span id="timecode">00:00:00</span></span>
+    <span><a href="/">← Index</a> &nbsp;·&nbsp; ISO 400 · f/2.8</span>
+  </div>
+
+  <div class="stage">
+    <div class="headline">
+      <span class="eyebrow">Prototype 01 · Viewfinder + chamber</span>
+      <h1>Brief in, <em>brand out.</em></h1>
+      <p>Hover any swatch to inspect it like a lens part. The chamber behind you is built from this kit's own five colors, reacting to your cursor.</p>
+      <div class="cta-row">
+        <a class="btn" href="/app/">Create your first kit</a>
+        <a class="btn ghost" href="/">Back to index</a>
+      </div>
+    </div>
+
+    <div class="specimen" id="specimen">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <div class="meta"><span>TestCo · fintech · v1</span><span>35MM / MACRO</span></div>
+      <div class="dots" id="dots"></div>
+      <h2 style="font-family:'Oswald',sans-serif;">TestCo, set in Oswald</h2>
+      <p class="sub" style="font-family:'Inter',sans-serif;">Body copy set in Inter. The quick brown fox jumps over the lazy dog.</p>
+      <div class="fonts">Heading: <b>Oswald</b> · Body: <b>Inter</b></div>
+      <div class="inspect" id="inspect">HOVER A LENS PART — point at any swatch to inspect it.</div>
+      <div><span class="stamp">AA PASS · 13.9:1</span></div>
+    </div>
+  </div>
+
+  <div class="hud-bottom">
+    <span>FOCUS [ AUTO ] · GRID III</span>
+    <span>CHAMBER: WEBGL · <span id="fps">--</span> FPS</span>
+  </div>
+</div>
+
+<p class="fallback-note" id="fallbackNote">3D chamber unavailable here. The specimen above is the whole story.</p>
+
+<script>
+const KIT = [
+  { hex: '#1D4ED8', role: 'Primary', lum: 0.088 },
+  { hex: '#0EA5E9', role: 'Secondary', lum: 0.312 },
+  { hex: '#F59E0B', role: 'Accent', lum: 0.382 },
+  { hex: '#F8FAFC', role: 'Background', lum: 0.945 },
+  { hex: '#1E293B', role: 'Neutral / Text', lum: 0.024 }
+];
+function ratio(a, b){
+  const hi = Math.max(a.lum, b.lum), lo = Math.min(a.lum, b.lum);
+  return ((hi + 0.05) / (lo + 0.05)).toFixed(1);
+}
+const TEXT = KIT[4], BG = KIT[3];
+
+/* Exploded inspection */
+const dotsEl = document.getElementById('dots');
+const inspectEl = document.getElementById('inspect');
+KIT.forEach((c, i) => {
+  const d = document.createElement('span');
+  d.className = 'dot' + (i === 0 ? ' sel' : '');
+  d.style.background = c.hex;
+  d.title = c.role + ' ' + c.hex;
+  d.addEventListener('mouseenter', () => {
+    dotsEl.querySelectorAll('.dot').forEach((x) => x.classList.remove('sel'));
+    d.classList.add('sel');
+    inspectEl.innerHTML =
+      'PART <b>0' + (i + 1) + ' / ' + c.role.toUpperCase() + '</b><br>' +
+      'HEX <b>' + c.hex + '</b> · LUMINANCE <b>' + c.lum.toFixed(3) + '</b><br>' +
+      'VS BACKGROUND <b>' + ratio(c, BG) + ':1</b> · VS TEXT <b>' + ratio(c, TEXT) + ':1</b>';
+    if (window.__chamberFocus) window.__chamberFocus(i);
+  });
+  dotsEl.appendChild(d);
+});
+
+/* Timecode */
+const tcEl = document.getElementById('timecode');
+const t0 = Date.now();
+setInterval(() => {
+  const s = Math.floor((Date.now() - t0) / 1000);
+  const p = (n) => String(n).padStart(2, '0');
+  tcEl.textContent = p(Math.floor(s / 3600)) + ':' + p(Math.floor(s / 60) % 60) + ':' + p(s % 60);
+}, 500);
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fpsEl = document.getElementById('fps');
+
+if (reduceMotion || !window.WebGLRenderingContext) {
+  document.getElementById('fallbackNote').style.display = 'block';
+  if (fpsEl) fpsEl.textContent = 'OFF';
+} else try {
+  const host = document.getElementById('chamber');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  host.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x101214, 0.055);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0.6, 11);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const key = new THREE.DirectionalLight(0xfff2df, 1.6);
+  key.position.set(5, 8, 6);
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0xF5A623, 1.1);
+  rim.position.set(-6, -3, -4);
+  scene.add(rim);
+
+  const group = new THREE.Group();
+  scene.add(group);
+  const prisms = [];
+  const palette = ['#1D4ED8', '#0EA5E9', '#F59E0B', '#F8FAFC', '#1E293B'];
+  const geos = [
+    new THREE.BoxGeometry(1.5, 1.5, 1.5),
+    new THREE.OctahedronGeometry(1.15),
+    new THREE.TetrahedronGeometry(1.35),
+    new THREE.IcosahedronGeometry(1.0),
+    new THREE.TorusKnotGeometry(0.75, 0.24, 120, 16)
+  ];
+  palette.forEach((hex, i) => {
+    const mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(hex), roughness: 0.25, metalness: 0.55,
+      transparent: true, opacity: 0.92, emissive: new THREE.Color(hex), emissiveIntensity: 0.18
+    });
+    const m = new THREE.Mesh(geos[i], mat);
+    const a = (i / palette.length) * Math.PI * 2;
+    m.position.set(Math.cos(a) * 3.4, (i % 2 ? 0.9 : -0.9) + (i - 2) * 0.22, Math.sin(a) * 1.6 - 1);
+    m.rotation.set(Math.random() * 3, Math.random() * 3, 0);
+    m.userData.spin = 0.12 + Math.random() * 0.25;
+    group.add(m);
+    prisms.push(m);
+    const wire = new THREE.Mesh(
+      geos[i],
+      new THREE.MeshBasicMaterial({ color: 0xF5A623, wireframe: true, transparent: true, opacity: 0.10 })
+    );
+    wire.position.copy(m.position);
+    wire.scale.setScalar(1.6);
+    wire.userData.spin = -m.userData.spin * 0.6;
+    wire.userData.base = m.position.clone();
+    group.add(wire);
+    prisms.push(wire);
+  });
+
+  const pGeo = new THREE.BufferGeometry();
+  const pCount = 420, pos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * 26;
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 16;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const dust = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x8B9474, size: 0.035, transparent: true, opacity: 0.7 }));
+  scene.add(dust);
+
+  let mx = 0, my = 0, tx = 0, ty = 0, focused = -1;
+  window.__chamberFocus = (i) => { focused = i; setTimeout(() => { focused = -1; }, 2200); };
+  window.addEventListener('mousemove', (e) => {
+    tx = (e.clientX / window.innerWidth - 0.5) * 2;
+    ty = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
+  window.addEventListener('scroll', () => {
+    group.rotation.y += 0.0016;
+  }, { passive: true });
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  const clock = new THREE.Clock();
+  let frames = 0, lastFps = performance.now();
+  (function loop(){
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    mx += (tx - mx) * 0.04;
+    my += (ty - my) * 0.04;
+    group.rotation.y += 0.0016;
+    group.rotation.x = my * 0.12;
+    camera.position.x = mx * 1.4;
+    camera.position.y = 0.6 - my * 0.9;
+    camera.lookAt(0, 0, -1);
+    prisms.forEach((m, i) => {
+      m.rotation.x += 0.0016 * (m.userData.spin || 0.2) * 10 * 0.1;
+      m.rotation.y += 0.0022 * (m.userData.spin || 0.2) * 10 * 0.1;
+      const s = (i === focused * 2 || i === focused * 2 + 1) ? 1.35 : 1.0;
+      const cur = m.scale.x + (s - m.scale.x) * 0.12;
+      m.scale.setScalar(cur);
+      m.position.y += Math.sin(t * 0.7 + i * 1.3) * 0.0016;
+    });
+    dust.rotation.y = t * 0.014;
+    renderer.render(scene, camera);
+    frames++;
+    const now = performance.now();
+    if (now - lastFps > 1000) {
+      if (fpsEl) fpsEl.textContent = String(Math.round(frames * 1000 / (now - lastFps)));
+      frames = 0; lastFps = now;
+    }
+  })();
+} catch (err) {
+  document.getElementById('fallbackNote').style.display = 'block';
+  if (fpsEl) fpsEl.textContent = 'OFF';
+}
+</script>
+</body>
+</html>
