@@ -92,7 +92,8 @@
   @media (max-width:900px){.hero{grid-template-columns:1fr; gap:36px; min-height:0;}}
   .hero h1{
     font-family:'Fraunces',serif; font-weight:500; font-size:clamp(52px, 7.5vw, 110px);
-    line-height:1.0; letter-spacing:-0.02em; margin:0 0 24px; text-align:left;
+    line-height:1.0; letter-spacing:-0.02em; margin:0 auto 24px; text-align:center;
+    text-wrap:balance; max-width:12ch;
   }
   .hero h1 em{font-style:italic; color:var(--accent);}
   .hero p.lede{font-size:18.5px; line-height:1.7; color:var(--ink-soft); max-width:48ch; margin:0 0 32px;}
@@ -237,7 +238,8 @@
   #toTop:hover{background:var(--accent); border-color:var(--accent);}
 
   /* Hero: centered solo */
-  .hero-center{grid-template-columns:1fr; max-width:980px; margin:0 auto; text-align:center; min-height:86vh; align-content:center;}
+  .hero-center{grid-template-columns:1fr; max-width:980px; margin:0 auto; text-align:center; min-height:86vh; align-content:center; justify-items:center;}
+  .hero-center > div{max-width:100%; margin-left:auto; margin-right:auto;}
   .hero-center p.lede{margin-left:auto; margin-right:auto;}
   .hero-center .hero-cta{justify-content:center;}
   .hero-center .hero-meta{max-width:none;}
@@ -301,14 +303,17 @@
   .sample-meta{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:14px; min-height:20px;}
   @media (max-width:600px){.folder{height:420px;}}
 
-  /* Scroll-built kit cards */
+  /* Scroll-built kit cards: header, then swatches drop, then type, then rationale */
+  .board .ind, .board h3{opacity:0; transform:translateY(8px); transition:opacity .45s ease .1s, transform .45s ease .1s;}
+  .board.in .ind, .board.in h3{opacity:1; transform:none;}
   .board .dots .dot{transform:scale(.3); opacity:0; transition:transform .45s cubic-bezier(.2,.9,.3,1.4), opacity .3s ease;}
   .board.in .dots .dot{transform:none; opacity:1;}
   .board.in .dots .dot:nth-child(2){transition-delay:.07s;}
   .board.in .dots .dot:nth-child(3){transition-delay:.14s;}
   .board.in .dots .dot:nth-child(4){transition-delay:.21s;}
   .board.in .dots .dot:nth-child(5){transition-delay:.28s;}
-  .board .tl, .board p{opacity:0; transform:translateY(10px); transition:opacity .5s ease .3s, transform .5s ease .3s;}
+  .board .tl, .board p{opacity:0; transform:translateY(10px); transition:opacity .5s ease .55s, transform .5s ease .55s;}
+  .board .tl{transition-delay:.4s;}
   .board.in .tl, .board.in p{opacity:1; transform:none;}
 
   /* Scroll reveal */
@@ -726,8 +731,10 @@ reshuffleBtn.addEventListener('click', async () => {
   reshuffleBtn.disabled = true;
   reshuffleBtn.textContent = 'Pulling from the log…';
   sampleMeta.textContent = 'Asking the logbook for a kit…';
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
   try {
-    const res = await fetch(N8N_GALLERY + '?action=list&t=' + Date.now());
+    const res = await fetch(N8N_GALLERY + '?action=list&t=' + Date.now(), { signal: controller.signal });
     if (!res.ok) throw new Error('status ' + res.status);
     const data = await res.json();
     const kits = Array.isArray(data.kits) ? data.kits.filter((k) => k && k.id && Array.isArray(k.palette) && k.palette.length) : [];
@@ -736,6 +743,7 @@ reshuffleBtn.addEventListener('click', async () => {
   } catch (err) {
     renderSample(FALLBACK_KITS[Math.floor(Math.random() * FALLBACK_KITS.length)], 'local sample (log unreachable)');
   } finally {
+    clearTimeout(timer);
     replayFolder();
     reshuffleBtn.disabled = false;
     reshuffleBtn.textContent = 'Generate a sample';
