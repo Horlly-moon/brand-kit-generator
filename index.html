@@ -587,7 +587,8 @@ if (reduced || !window.WebGLRenderingContext) {
       v * 2.7 - 1.35
     ));
   }
-  const jar = new THREE.Mesh(new THREE.LatheGeometry(jarPts, HIGH ? 56 : 28), glassMat());
+  const jarMat = glassMat();
+  const jar = new THREE.Mesh(new THREE.LatheGeometry(jarPts, HIGH ? 56 : 28), jarMat);
   jar.position.set(0, 0.4, 0);
   jar.castShadow = HIGH;
   const jarRim = new THREE.Mesh(new THREE.TorusGeometry(1.14, 0.07, 12, 48), brassMat);
@@ -609,7 +610,7 @@ if (reduced || !window.WebGLRenderingContext) {
 
   /* CH2: vial wall + ejecta. */
   const vialGlassMat = HIGH
-    ? new THREE.MeshPhysicalMaterial({ color: 0xcfd8d2, roughness: 0.1, metalness: 0, transmission: 0.6, thickness: 0.2, transparent: true, envMapIntensity: 0.8 })
+    ? new THREE.MeshPhysicalMaterial({ color: 0xcfd8d2, roughness: 0.08, metalness: 0, transparent: true, opacity: 0.42, envMapIntensity: 1.0, clearcoat: 0.6 })
     : new THREE.MeshStandardMaterial({ color: 0xcfd8d2, roughness: 0.2, transparent: true, opacity: 0.35 });
   const vialGeo = new THREE.CylinderGeometry(0.16, 0.16, 0.9, HIGH ? 14 : 8);
   const vialCols = ['#1D4ED8', '#0EA5E9', '#F59E0B', '#E63946', '#27AE60', '#2E86AB'];
@@ -742,9 +743,10 @@ if (reduced || !window.WebGLRenderingContext) {
   plaque.position.set(0, -1.05, 0.85);
   plaque.rotation.x = -0.22;
   caseGroup.add(plaque);
+  const caseGlassMat = glassMat();
   const caseGlass = new THREE.Mesh(
     new THREE.BoxGeometry(5.6, 3.0, 1.6),
-    glassMat()
+    caseGlassMat
   );
   caseGlass.position.y = 0.4;
   caseGroup.add(caseGlass);
@@ -937,12 +939,37 @@ if (reduced || !window.WebGLRenderingContext) {
   }
 
   const clock = new THREE.Clock();
+  let qLevel = 0, qAcc = 0, qN = 0;
+  function applyQuality(){
+    if (qLevel >= 1 && composer) { composer = null; }
+    if (qLevel >= 2) {
+      [jarMat, caseGlassMat].forEach((m) => {
+        if (!m) return;
+        m.transmission = 0;
+        m.opacity = 0.3;
+        m.transparent = true;
+        m.needsUpdate = true;
+      });
+    }
+    if (qLevel >= 3) {
+      exam.castShadow = false;
+      renderer.setPixelRatio(1);
+    }
+  }
+  function govern(dt){
+    qAcc += dt; qN++;
+    if (qAcc >= 2.5) {
+      const fps = qN / qAcc;
+      qAcc = 0; qN = 0;
+      if (fps < 38 && qLevel < 3 && clock.elapsedTime > 8) { qLevel++; applyQuality(); }
+    }
+  }
 
   /* GSAP scrub: scroll drives progress; loop eases toward it. */
   let target = 0;
   ScrollTrigger.create({
     trigger: '#journey', start: 'top top', end: 'bottom bottom',
-    scrub: 0.6,
+    scrub: 0.25,
     onUpdate: (self) => { target = self.progress; }
   });
 
@@ -967,13 +994,14 @@ if (reduced || !window.WebGLRenderingContext) {
     requestAnimationFrame(loop);
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
+    govern(dt);
     if (inspecting) {
       controls.update();
       dust.rotation.y = t * 0.008;
       render();
       return;
     }
-    prog += (target - prog) * Math.min(dt * 3.2, 1);
+    prog += (target - prog) * Math.min(dt * 5.5, 1);
     mx += (tx - mx) * 0.04;
     my += (ty - my) * 0.04;
 
