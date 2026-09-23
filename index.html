@@ -82,21 +82,56 @@
   }
   .theme-toggle:hover{border-color:var(--accent); color:var(--ink);}
 
-  /* Index rail */
+  /* Index rail: edge tab dividers */
   .rail{
-    position:fixed; left:22px; top:50%; transform:translateY(-50%); z-index:40;
-    display:flex; flex-direction:column; gap:14px;
+    position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:40;
+    display:flex; flex-direction:column; gap:6px;
   }
   .rail a{
     font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
-    text-decoration:none; letter-spacing:0.06em; opacity:0.55; transition:opacity .2s ease, color .2s ease;
+    text-decoration:none; letter-spacing:0.06em;
+    background:var(--paper-2); border:1px solid var(--line); border-right:none;
+    border-radius:4px 0 0 4px; padding:10px 8px 10px 12px;
+    opacity:0.65; transition:opacity .2s ease, color .2s ease, padding .2s ease, background .2s ease;
     display:flex; align-items:center; gap:8px;
   }
-  .rail a::before{content:''; width:18px; height:1px; background:currentColor; transition:width .2s ease;}
   .rail a:hover{opacity:1;}
-  .rail a.active{opacity:1; color:var(--accent);}
-  .rail a.active::before{width:30px;}
+  .rail a.active{opacity:1; color:var(--accent); background:var(--card); padding-left:20px;}
+  .rail a b{font-weight:500;}
+  .rail .folio{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft);
+    letter-spacing:0.08em; text-align:right; padding:8px 12px 0 0; opacity:0.7;
+  }
   @media (max-width:1100px){.rail{display:none;}}
+
+  /* Folio + page navigation */
+  .folio-line{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--ink-soft); margin-bottom:14px;
+  }
+  .folio-line .pg{color:var(--accent);}
+  .page-nav{
+    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    margin-top:44px; padding-top:20px; border-top:1px solid var(--line);
+  }
+  .page-nav a{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--ink-soft); text-decoration:none;
+    transition:color .15s ease;
+  }
+  .page-nav a:hover{color:var(--accent);}
+  .page-nav a .ch{color:var(--accent); margin:0 6px;}
+
+  /* Dog-eared cards */
+  .dogear{position:relative;}
+  .dogear::after{
+    content:''; position:absolute; top:-1px; right:-1px; width:26px; height:26px;
+    background:linear-gradient(to bottom left, var(--paper) 0 49%, var(--line) 50%, var(--card) 51% 100%);
+    border-radius:0 var(--radius) 0 4px;
+    transition:width .25s ease, height .25s ease;
+  }
+  .dogear:hover::after{width:34px; height:34px;}
 
   .eyebrow{
     font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em;
@@ -254,11 +289,12 @@
 <body>
 
 <nav class="rail" aria-label="Index">
-  <a href="#brief" data-ch="brief">01 Brief</a>
-  <a href="#proof" data-ch="proof">02 Proof</a>
-  <a href="#measure" data-ch="measure">03 Measure</a>
-  <a href="#kits" data-ch="kits">04 Kits</a>
-  <a href="#begin" data-ch="begin">05 Begin</a>
+  <a href="#brief" data-ch="brief"><b>01</b>Brief</a>
+  <a href="#proof" data-ch="proof"><b>02</b>Proof</a>
+  <a href="#measure" data-ch="measure"><b>03</b>Measure</a>
+  <a href="#kits" data-ch="kits"><b>04</b>Kits</a>
+  <a href="#begin" data-ch="begin"><b>05</b>Begin</a>
+  <span class="folio" id="folioNow">p.01 / 05</span>
 </nav>
 
 <div class="wrap">
@@ -277,6 +313,7 @@
   <!-- 01 BRIEF -->
   <div class="hero" id="brief">
     <div>
+      <div class="folio-line"><span>Chapter 01, Brief</span><span class="pg">p.01 / 05</span></div>
       <span class="eyebrow">01 / Brief</span>
       <h1>Brief in, <em>brand out.</em></h1>
       <p class="lede">Describe your brand. In about two minutes you get a palette with named roles, a heading and body type pairing, and a written rationale. Generated, measured, and ready to refine.</p>
@@ -290,7 +327,7 @@
         <div class="stat"><div class="v"><span data-count="2">0</span><small>min</small></div><div class="k">Per kit</div></div>
       </div>
     </div>
-    <div class="assemble" id="assemble">
+    <div class="assemble dogear" id="assemble">
       <span class="tag">Live assembly, TestCo · fintech · v1</span>
       <div class="asm-row" id="asmDots">
         <span class="asm-dot" style="background:#1D4ED8; animation-delay:.15s"></span>
@@ -308,9 +345,12 @@
     </div>
   </div>
 
+  <div class="page-nav" style="max-width:1240px;"><span></span><a href="#proof">Next <span class="ch">02</span> Proof &rarr;</a></div>
+
   <!-- 02 PROOF -->
   <section class="chapter reveal" id="proof">
-    <span class="eyebrow">02 / Proof</span>
+    <div class="folio-line"><span>Chapter 02, Proof</span><span class="pg">p.02 / 05</span></div>
+      <span class="eyebrow">02 / Proof</span>
     <h2 class="ch-title"><span class="no">02</span>Every pairing, proved on the page.</h2>
     <p class="ch-sub">Specimen never names fonts from memory. It picks from Google's live catalog, then shows the actual faces at work: capitals, lowercase, numerals, weights.</p>
     <div class="rule" data-rule></div>
@@ -332,24 +372,27 @@
     </div>
   </section>
 
+  <div class="page-nav" style="max-width:1240px;"><a href="#proof">&larr; Prev <span class="ch">02</span> Proof</a><a href="#measure">Next <span class="ch">03</span> Measure &rarr;</a></div>
+
   <!-- 03 MEASURE -->
   <section class="chapter reveal" id="measure">
-    <span class="eyebrow">03 / Measure</span>
+    <div class="folio-line"><span>Chapter 03, Measure</span><span class="pg">p.03 / 05</span></div>
+      <span class="eyebrow">03 / Measure</span>
     <h2 class="ch-title"><span class="no">03</span>Every claim carries a reading.</h2>
     <p class="ch-sub">The lab panel on one TestCo kit. Nothing here is adjectives. Contrast is calculated per WCAG with a 4.5:1 floor, fonts are drawn from about two thousand faces fetched at generation time, misses get a deterministic HSL auto-fix instead of a second AI call.</p>
     <div class="rule" data-rule></div>
     <div class="lab-grid" style="margin-top:36px;">
-      <div class="meter reveal" data-delay="1">
+      <div class="meter dogear reveal" data-delay="1">
         <div class="reading"><span data-count="13.9" data-dec="1">0</span><small>:1</small></div>
         <div class="cap">Text/bg contrast · AA PASS</div>
         <p>Computed from relative luminance, not claimed. Floor is <b>4.5:1</b>.</p>
       </div>
-      <div class="meter reveal" data-delay="2">
+      <div class="meter dogear reveal" data-delay="2">
         <div class="reading"><span data-count="2000" data-plus="1">0</span><small>+</small></div>
         <div class="cap">Catalog faces available</div>
         <p>Both fonts must come from <b>Google Fonts live list</b>. Invented names are rejected.</p>
       </div>
-      <div class="meter reveal" data-delay="3">
+      <div class="meter dogear reveal" data-delay="3">
         <div class="reading"><span data-count="5">0</span><small>roles</small></div>
         <div class="cap">Primary → Neutral/Text</div>
         <p>Five colors, named roles, <b>60-30-10</b> balance where it fits the brief.</p>
@@ -357,14 +400,17 @@
     </div>
   </section>
 
+  <div class="page-nav" style="max-width:1240px;"><a href="#measure">&larr; Prev <span class="ch">03</span> Measure</a><a href="#kits">Next <span class="ch">04</span> Kits &rarr;</a></div>
+
   <!-- 04 KITS -->
   <section class="chapter reveal" id="kits">
-    <span class="eyebrow">04 / Kits</span>
+    <div class="folio-line"><span>Chapter 04, Kits</span><span class="pg">p.04 / 05</span></div>
+      <span class="eyebrow">04 / Kits</span>
     <h2 class="ch-title"><span class="no">04</span>Contact sheets from the logbook.</h2>
     <p class="ch-sub">Real generations across food, fintech, and logistics. Kits you make land in History, ready to reopen and refine.</p>
     <div class="rule" data-rule></div>
     <div class="sheets" style="margin-top:36px;">
-      <div class="sheet reveal" data-delay="1">
+      <div class="sheet dogear reveal" data-delay="1">
         <div class="frame">
           <span class="dot" style="background:#E63946"></span>
           <span class="dot" style="background:#F1FA8C"></span>
@@ -377,7 +423,7 @@
         <div class="data">CONTRAST <b>12.5:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b> · REFINES <b>0</b></div>
         <p>Seed logo colors lead as primary and secondary, with a golden accent for appetite appeal on cream.</p>
       </div>
-      <div class="sheet reveal" data-delay="2">
+      <div class="sheet dogear reveal" data-delay="2">
         <div class="frame">
           <span class="dot" style="background:#1D4ED8"></span>
           <span class="dot" style="background:#0EA5E9"></span>
@@ -390,7 +436,7 @@
         <div class="data">CONTRAST <b>13.9:1</b> · <b>AA PASS</b><br>RATIONALE <b>INCLUDED</b> · REFINES <b>2</b></div>
         <p>Deep blue trust base with an amber energy accent. Red was explicitly avoided per the brief.</p>
       </div>
-      <div class="sheet reveal" data-delay="3">
+      <div class="sheet dogear reveal" data-delay="3">
         <div class="frame">
           <span class="dot" style="background:#1A3A5C"></span>
           <span class="dot" style="background:#2E86AB"></span>
@@ -413,17 +459,17 @@
     <p class="ch-sub">Three steps, one continuous loop. Every iteration is versioned and logged to your history.</p>
     <div class="rule" data-rule></div>
     <div class="steps" style="margin-top:36px;">
-      <div class="step reveal" data-delay="1">
+      <div class="step dogear reveal" data-delay="1">
         <span class="num">01</span>
         <h3>Describe</h3>
         <p>Name, industry, mood, and colors to avoid, plus an optional logo. Logo colors are read in your browser and sent as seed tones. The image never leaves your machine.</p>
       </div>
-      <div class="step reveal" data-delay="2">
+      <div class="step dogear reveal" data-delay="2">
         <span class="num">02</span>
         <h3>Generate</h3>
         <p>Your brief meets the live font catalog and real design constraints: 60-30-10 balance, color psychology, and a contrasting but readable pairing. A full kit returns in about two minutes.</p>
       </div>
-      <div class="step reveal" data-delay="3">
+      <div class="step dogear reveal" data-delay="3">
         <span class="num">03</span>
         <h3>Refine</h3>
         <p>Nudge it in plain words. Try more playful or swap the accent. Only the requested change moves and everything else holds. Each version is logged to your history.</p>
@@ -431,9 +477,12 @@
     </div>
   </section>
 
+  <div class="page-nav" style="max-width:1240px;"><a href="#kits">&larr; Prev <span class="ch">04</span> Kits</a><a href="#begin">Next <span class="ch">05</span> Begin &rarr;</a></div>
+
   <!-- 05 BEGIN -->
   <section class="chapter reveal" id="begin">
-    <span class="eyebrow">05 / Begin</span>
+    <div class="folio-line"><span>Chapter 05, Begin</span><span class="pg">p.05 / 05</span></div>
+      <span class="eyebrow">05 / Begin</span>
     <h2 class="ch-title"><span class="no">05</span>Set your first kit.</h2>
     <p class="ch-sub">Free while in the specimen stage. Takes about two minutes, and every version stays in your history.</p>
     <div class="cta-block" style="margin-top:0;">
@@ -540,6 +589,10 @@ if ('IntersectionObserver' in window) {
         railLinks.forEach((a) => a.classList.remove('active'));
         const link = byId[entry.target.id];
         if (link) link.classList.add('active');
+        const folioNow = document.getElementById('folioNow');
+        const order = ['brief', 'proof', 'measure', 'kits', 'begin'];
+        const idx = order.indexOf(entry.target.id);
+        if (folioNow && idx >= 0) folioNow.textContent = 'p.0' + (idx + 1) + ' / 05';
       }
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
