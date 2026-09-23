@@ -587,6 +587,12 @@ function initReveals(){
 }
 initReveals();
 
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, (m) => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+
 const toTop = document.getElementById('toTop');
 window.addEventListener('scroll', () => {
   toTop.classList.toggle('show', window.scrollY > 600);
