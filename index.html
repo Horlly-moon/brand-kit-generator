@@ -281,6 +281,20 @@
     border-radius:0 var(--radius) 0 4px; transition:width .25s ease, height .25s ease;
   }
   .dogear:hover::after{width:34px; height:34px;}
+  /* Intro + frost wash */
+  #intro{position:fixed; inset:0; z-index:100; background:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .9s ease; cursor:pointer;}
+  #intro.gone{opacity:0; pointer-events:none;}
+  .intro-inner{text-align:center; padding:0 24px;}
+  #introWord{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(52px, 10vw, 132px); letter-spacing:.02em; line-height:1;}
+  #introWord em{font-style:italic; color:var(--accent);}
+  #introPct{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-soft); letter-spacing:.24em; margin-top:22px;}
+  .intro-sub{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.24em; color:var(--sage); margin-top:8px; text-transform:uppercase;}
+  .intro-skip{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.2em; color:var(--ink-soft); margin-top:26px; text-transform:uppercase; opacity:.6;}
+  #frost{position:fixed; inset:0; z-index:45; pointer-events:none; opacity:0; transition:opacity .8s ease;
+    background:radial-gradient(ellipse at center, rgba(200,210,218,.85) 0%, rgba(200,210,218,.25) 45%, transparent 75%);}
+  #frost.wash{opacity:.55; transition:opacity .1s ease;}
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     .reveal,.rule{opacity:1; transform:none; transition:none;}
@@ -295,6 +309,15 @@
 </script>
 </head>
 <body>
+<div id="intro" title="Click to skip">
+  <div class="intro-inner">
+    <div id="introWord">SPECIMEN</div>
+    <div id="introPct">00</div>
+    <div class="intro-sub" id="introSub">CALIBRATING INSTRUMENTS</div>
+    <div class="intro-skip">Click anywhere to skip</div>
+  </div>
+</div>
+<div id="frost" aria-hidden="true"></div>
 <div id="chamber" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
@@ -534,6 +557,7 @@ function initReveals(){
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add('in');
+        entry.target.querySelectorAll('h1, h2.ch-title').forEach(scrambleIn);
         observer.unobserve(entry.target);
       }
     });
@@ -654,6 +678,8 @@ if ('IntersectionObserver' in window) {
         const idx = order.indexOf(entry.target.id);
         if (folioNow && idx >= 0) folioNow.textContent = 'p.0' + (idx + 1) + ' / 05';
         if (window.__chamberChapter) window.__chamberChapter(idx);
+        if (window.__chapterShape) window.__chapterShape(idx);
+        chapterWash();
       }
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
@@ -850,6 +876,87 @@ toTop.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
+/* Letter scramble for headlines. */
+const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#%&/';
+function scrambleIn(el){
+  if (reduceMotion || !el || el.dataset.scrambled) return;
+  el.dataset.scrambled = '1';
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const states = [];
+  while (walker.nextNode()) {
+    if (walker.currentNode.textContent.trim().length) {
+      states.push({ n: walker.currentNode, orig: walker.currentNode.textContent });
+    }
+  }
+  if (!states.length) return;
+  let frame = 0;
+  const iv = setInterval(() => {
+    frame++;
+    let done = true;
+    states.forEach((s) => {
+      const reveal = Math.floor(frame / 2);
+      let out = '';
+      for (let i = 0; i < s.orig.length; i++) {
+        const ch = s.orig[i];
+        if (ch === ' ' || ch === '\n' || i < reveal) { out += ch; }
+        else { out += GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; done = false; }
+      }
+      s.n.textContent = out;
+    });
+    if (done) { clearInterval(iv); states.forEach((s) => { s.n.textContent = s.orig; }); }
+  }, 34);
+}
+
+/* Frost-wash chapter cut. */
+let washTimer = null;
+function chapterWash(){
+  if (reduceMotion) return;
+  const frost = document.getElementById('frost');
+  if (!frost) return;
+  frost.classList.add('wash');
+  clearTimeout(washTimer);
+  washTimer = setTimeout(() => frost.classList.remove('wash'), 150);
+}
+
+/* Intro sequence: scramble, counter, dissolve. */
+(function intro(){
+  const box = document.getElementById('intro');
+  if (!box) return;
+  if (reduceMotion) { box.remove(); return; }
+  const word = document.getElementById('introWord');
+  const pct = document.getElementById('introPct');
+  const sub = document.getElementById('introSub');
+  const subs = ['CALIBRATING INSTRUMENTS', 'LOADING FONT CATALOG', 'CHECKING CONTRAST', 'OPENING THE CHAMBER'];
+  let gone = false;
+  function finish(){
+    if (gone) return;
+    gone = true;
+    box.classList.add('gone');
+    setTimeout(() => box.remove(), 1000);
+  }
+  box.addEventListener('click', finish);
+  setTimeout(finish, 6000);
+  const orig = 'SPECIMEN';
+  let frame = 0;
+  const total = 46;
+  const iv = setInterval(() => {
+    frame++;
+    const p = Math.min(frame / total, 1);
+    pct.textContent = String(Math.floor(p * 100)).padStart(2, '0');
+    sub.textContent = subs[Math.min(Math.floor(p * subs.length), subs.length - 1)];
+    let out = '';
+    for (let i = 0; i < orig.length; i++) {
+      out += (i / orig.length < p - 0.12) ? orig[i] : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+    }
+    word.textContent = out;
+    if (p >= 1) {
+      clearInterval(iv);
+      word.innerHTML = 'SPECI<em>MEN</em>';
+      setTimeout(finish, 350);
+    }
+  }, 36);
+})();
+
 /* Timecode */
 const tcEl = document.querySelector('nav.main .tc');
 if (tcEl) {
@@ -868,10 +975,10 @@ import * as THREE from 'three';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduceMotionM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fpsEl = document.getElementById('fpsFoot');
 
-if (reduceMotion || !window.WebGLRenderingContext) {
+if (reduceMotionM || !window.WebGLRenderingContext) {
   if (fpsEl) fpsEl.textContent = 'CHAMBER OFF';
 } else try {
   const host = document.getElementById('chamber');
@@ -938,36 +1045,113 @@ if (reduceMotion || !window.WebGLRenderingContext) {
     letters.push(m);
   });
 
-  /* Scanner ring + sweep plane: the instrument around the word. */
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(7.2, 0.035, 12, 128),
-    new THREE.MeshBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.35 })
-  );
-  ring.rotation.x = Math.PI / 2.25;
-  scene.add(ring);
-  const ring2 = new THREE.Mesh(
-    new THREE.TorusGeometry(8.6, 0.02, 12, 128),
-    new THREE.MeshBasicMaterial({ color: 0x8B9474, transparent: true, opacity: 0.22 })
-  );
-  ring2.rotation.x = Math.PI / 1.8;
-  ring2.rotation.y = 0.4;
-  scene.add(ring2);
-  const sweep = new THREE.Mesh(
-    new THREE.PlaneGeometry(22, 0.06),
-    new THREE.MeshBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.28, side: THREE.DoubleSide })
-  );
-  sweep.position.z = -2;
-  scene.add(sweep);
-
-  const pGeo = new THREE.BufferGeometry();
-  const pCount = 170, pos = new Float32Array(pCount * 3);
-  for (let i = 0; i < pCount; i++) {
-    pos[i * 3] = (Math.random() - 0.5) * 26;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * 16;
-    pos[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2;
+  /* Frozen enclosures: displaced glass shells on a fresnel shader. */
+  function shellGeo(r){
+    const g = new THREE.IcosahedronGeometry(r, 2);
+    const pos = g.attributes.position;
+    const v = new THREE.Vector3();
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i);
+      const n = 1 + 0.09 * Math.sin(v.x * 2.1 + v.y * 1.7) * Math.cos(v.y * 1.9 + v.z * 2.3);
+      v.multiplyScalar(n);
+      pos.setXYZ(i, v.x, v.y, v.z);
+    }
+    g.computeVertexNormals();
+    return g;
   }
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const dust = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x8B9474, size: 0.035, transparent: true, opacity: 0.4 }));
+  const fresnelMat = new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color(0x9fb6c9) } },
+    vertexShader: 'varying vec3 vN; varying vec3 vV;\n' +
+      'void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0);' +
+      ' vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz);' +
+      ' gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform vec3 uColor; varying vec3 vN; varying vec3 vV;\n' +
+      'void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);' +
+      ' gl_FragColor = vec4(uColor * f + vec3(0.55, 0.62, 0.68) * f * 0.6, f * 0.75); }',
+    transparent: true, depthWrite: false, side: THREE.DoubleSide
+  });
+  const shells = [];
+  [[-7.5, 0.6, -5, 3.1], [7.2, -0.6, -6, 3.7], [0, 3.8, -9, 4.6]].forEach((s, i) => {
+    const m = new THREE.Mesh(shellGeo(s[3]), fresnelMat);
+    m.position.set(s[0], s[1], s[2]);
+    m.userData.spin = (i % 2 ? -1 : 1) * (0.05 + i * 0.02);
+    scene.add(m);
+    shells.push(m);
+  });
+
+  /* Particle index: one cloud, five shapes, morphs per chapter. */
+  const COUNT = 420;
+  function rnd(i, salt){
+    const v = Math.sin(i * 127.1 + (salt || 0) * 311.7) * 43758.5453;
+    return v - Math.floor(v);
+  }
+  function shapePoint(shape, i, out){
+    const f = i / COUNT;
+    if (shape === 0) {
+      const th = rnd(i, 1) * Math.PI * 2, ph = Math.acos(2 * rnd(i, 2) - 1), r = 4.4;
+      out[0] = r * Math.sin(ph) * Math.cos(th);
+      out[1] = r * Math.cos(ph);
+      out[2] = r * Math.sin(ph) * Math.sin(th) - 3;
+    } else if (shape === 1) {
+      const a = f * Math.PI * 9;
+      out[0] = Math.cos(a) * 3.1;
+      out[1] = (f - 0.5) * 9.5;
+      out[2] = Math.sin(a) * 3.1 - 3;
+    } else if (shape === 2) {
+      const u = rnd(i, 3) * Math.PI * 2, v = rnd(i, 4) * Math.PI * 2;
+      const R = 4.1, r = 1.35;
+      out[0] = (R + r * Math.cos(v)) * Math.cos(u);
+      out[1] = r * Math.sin(v);
+      out[2] = (R + r * Math.cos(v)) * Math.sin(u) - 3;
+    } else if (shape === 3) {
+      out[0] = (rnd(i, 5) - 0.5) * 7.4;
+      out[1] = (rnd(i, 6) - 0.5) * 7.4;
+      out[2] = (rnd(i, 7) - 0.5) * 7.4 - 3;
+    } else {
+      const r = 4.6 * Math.sqrt(rnd(i, 8)), a = rnd(i, 9) * Math.PI * 2;
+      out[0] = Math.cos(a) * r;
+      out[1] = (rnd(i, 10) - 0.5) * 0.8;
+      out[2] = Math.sin(a) * r - 3;
+    }
+  }
+  const pGeo = new THREE.BufferGeometry();
+  const cur = new Float32Array(COUNT * 3);
+  const from = new Float32Array(COUNT * 3);
+  const to = new Float32Array(COUNT * 3);
+  const col = new Float32Array(COUNT * 3);
+  const tmp = [0, 0, 0];
+  for (let i = 0; i < COUNT; i++) {
+    shapePoint(0, i, tmp);
+    cur[i * 3] = tmp[0]; cur[i * 3 + 1] = tmp[1]; cur[i * 3 + 2] = tmp[2];
+    from[i * 3] = tmp[0]; from[i * 3 + 1] = tmp[1]; from[i * 3 + 2] = tmp[2];
+    to[i * 3] = tmp[0]; to[i * 3 + 1] = tmp[1]; to[i * 3 + 2] = tmp[2];
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(cur, 3));
+  pGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const pMat = new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true, opacity: 0.9 });
+  const cloud = new THREE.Points(pGeo, pMat);
+  scene.add(cloud);
+  const amber = new THREE.Color(0xF5A623), sage = new THREE.Color(0x8B9474), mixC = new THREE.Color();
+  let morphT = 1;
+  window.__chapterShape = (idx) => {
+    const s = idx < 0 ? 0 : idx % 5;
+    from.set(cur);
+    for (let i = 0; i < COUNT; i++) {
+      shapePoint(s, i, tmp);
+      to[i * 3] = tmp[0]; to[i * 3 + 1] = tmp[1]; to[i * 3 + 2] = tmp[2];
+    }
+    morphT = 0;
+  };
+
+  const dGeo = new THREE.BufferGeometry();
+  const dCount = 170, dPos = new Float32Array(dCount * 3);
+  for (let i = 0; i < dCount; i++) {
+    dPos[i * 3] = (Math.random() - 0.5) * 26;
+    dPos[i * 3 + 1] = (Math.random() - 0.5) * 16;
+    dPos[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2;
+  }
+  dGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3));
+  const dust = new THREE.Points(dGeo, new THREE.PointsMaterial({ color: 0x8B9474, size: 0.035, transparent: true, opacity: 0.4 }));
   scene.add(dust);
 
   let mx = 0, my = 0, tx = 0, ty = 0, focusedHex = null, focusTimer = 0;
@@ -1038,7 +1222,8 @@ if (reduceMotion || !window.WebGLRenderingContext) {
   let frames = 0, lastFps = performance.now();
   (function loop(){
     requestAnimationFrame(loop);
-    const t = clock.getElapsedTime();
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.elapsedTime;
     mx += (tx - mx) * 0.035;
     my += (ty - my) * 0.035;
     if (!dragging && Math.abs(dragVel) > 0.0002) {
@@ -1051,10 +1236,24 @@ if (reduceMotion || !window.WebGLRenderingContext) {
       ? window.scrollY / (doc.scrollHeight - window.innerHeight) : 0;
     if (!dragging) group.rotation.y += 0.0009;
     group.rotation.x = my * 0.1;
-    ring.rotation.z = t * 0.12 + chapterMix * 2.2 + prog * 3.0;
-    ring2.rotation.z = -t * 0.07 - chapterMix * 1.4;
-    sweep.position.y = Math.sin(t * 0.5) * 2.4 + prog * 3.0 - 1.5;
-    sweep.material.opacity = 0.2 + 0.1 * Math.sin(t * 1.3);
+    shells.forEach((s, i) => {
+      s.rotation.x += s.userData.spin;
+      s.rotation.y += s.userData.spin * 1.3;
+    });
+    if (morphT < 1) {
+      morphT = Math.min(morphT + dt * 0.7, 1);
+      const e = 1 - Math.pow(1 - morphT, 3);
+      for (let i = 0; i < COUNT * 3; i++) {
+        const prev = cur[i];
+        cur[i] = from[i] + (to[i] - from[i]) * e;
+        const sp = Math.min(Math.abs(cur[i] - prev) * 40, 1);
+        mixC.copy(sage).lerp(amber, sp);
+        col[i * 3] = mixC.r; col[i * 3 + 1] = mixC.g; col[i * 3 + 2] = mixC.b;
+      }
+      pGeo.attributes.position.needsUpdate = true;
+      pGeo.attributes.color.needsUpdate = true;
+    }
+    cloud.rotation.y = t * 0.02 + chapterMix * 1.5;
     camera.position.x = mx * 1.2;
     camera.position.y = 0.4 - my * 0.8 + prog * 1.0;
     camera.lookAt(0, prog * 0.8 - 0.3, -1);
