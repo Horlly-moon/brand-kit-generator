@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Specimen: brief in, brand out</title>
-<meta name="description" content="Describe your brand. Get a palette, type pairing, and rationale in about two minutes. Real Google Fonts, measured accessibility.">
+<title>Specimen Lab: brief in, brand out</title>
+<meta name="description" content="A working laboratory for brand kits. Calibrate, specimen, analyze, observe. Real Google Fonts, measured accessibility.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Baloo+2:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,12 +12,12 @@
   :root{
     --paper:#101214; --paper-2:#181C1F; --ink:#EEEFEA; --ink-soft:#A7ACA6;
     --accent:#F5A623; --sage:#8B9474; --line:#2A3034; --card:rgba(24,28,31,0.78);
-    --glow:rgba(245,166,35,0.14); --radius:2px;
+    --glow:rgba(245,166,35,0.14); --radius:2px; --pass:#7BC47F; --fail:#E5484D;
   }
   [data-theme="light"]{
     --paper:#EEEFEA; --paper-2:#E4E5DE; --ink:#14171A; --ink-soft:#4B4F51;
-    --accent:#B97A12; --sage:#8B9474; --line:#C9CAC2; --card:rgba(251,250,247,0.82);
-    --glow:rgba(185,122,18,0.10);
+    --accent:#B97A12; --sage:#8B9474; --line:#C9CAC2; --card:rgba(251,250,247,0.84);
+    --glow:rgba(185,122,18,0.10); --pass:#2E7D32; --fail:#C62828;
   }
   *{box-sizing:border-box;}
   [hidden]{display:none !important;}
@@ -64,9 +64,9 @@
     border:1px solid var(--accent); border-radius:var(--radius);
     padding:14px 28px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500;
     letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; cursor:pointer;
-    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+    transition:transform .2s ease, box-shadow .2s ease; will-change:transform;
   }
-  .btn:hover{transform:translateY(-2px); box-shadow:0 8px 28px var(--glow);}
+  .btn:hover{box-shadow:0 8px 28px var(--glow);}
   .btn.ghost{background:transparent; color:var(--ink); border-color:var(--line);}
   .btn.ghost:hover{border-color:var(--accent); color:var(--accent); box-shadow:none;}
   .theme-toggle{
@@ -95,32 +95,34 @@
   @media (max-width:1100px){.rail{display:none;}}
 
   .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:16px;}
-  section.chapter{padding:130px 0; border-bottom:1px solid var(--line); max-width:1240px;}
-  section.chapter:last-of-type{border-bottom:none;}
+  section.chapter{padding:130px 0; max-width:1240px; position:relative;}
+  section.chapter + section.chapter{border-top:1px dashed var(--line);}
   h2.ch-title{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(32px, 4vw, 48px); margin:0 0 16px; letter-spacing:-0.01em;}
   h2.ch-title .no{font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--ink-soft); vertical-align:super; letter-spacing:0.1em; margin-right:12px;}
   p.ch-sub{color:var(--ink-soft); font-size:17px; line-height:1.7; max-width:64ch; margin:0 0 40px;}
   .folio-line{display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:14px;}
   .folio-line .pg{color:var(--accent);}
-  .page-nav{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:44px; padding-top:20px; border-top:1px solid var(--line);}
+  .page-nav{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:48px; padding-top:20px; border-top:1px solid var(--line);}
   .page-nav a{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); text-decoration:none; transition:color .15s ease;}
   .page-nav a:hover{color:var(--accent);}
   .page-nav a .ch{color:var(--accent); margin:0 6px;}
 
   .card{background:var(--card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--line); border-radius:var(--radius);}
+  [data-split] .ch{display:inline-block; cursor:default;}
 
-  /* Hero */
+  /* Hero / calibrate */
   .hero{min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:40px 0 64px; max-width:1240px;}
   .hero h1{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(56px, 8.5vw, 124px); line-height:0.98; letter-spacing:-0.025em; margin:0 0 26px; text-wrap:balance; max-width:11ch; text-shadow:0 4px 40px rgba(0,0,0,0.45);}
   .hero h1 em{font-style:italic; color:var(--accent);}
   .hero p.lede{font-size:19px; line-height:1.7; color:var(--ink-soft); max-width:52ch; margin:0 0 34px; text-shadow:0 2px 18px rgba(0,0,0,0.5);}
+  .hero p.lede b{color:var(--ink);}
   .hero-cta{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:34px;}
   .hero-stats{display:flex; gap:36px; flex-wrap:wrap;}
   .stat .v{font-family:'Fraunces',serif; font-size:34px; font-weight:500;}
   .stat .v small{font-size:18px; color:var(--accent);}
   .stat .k{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-soft);}
 
-  /* Folder stage */
+  /* Folder / specimen drawer */
   .folder-scene{perspective:1200px; max-width:640px; margin:8px 0 0;}
   .folder{position:relative; height:380px; transform-style:preserve-3d;}
   .folder-back{position:absolute; left:6%; right:6%; top:60px; bottom:0; background:var(--paper-2); border:1px solid var(--line); border-radius:6px 6px 4px 4px;}
@@ -141,7 +143,8 @@
   .folder.open .folder-paper.behind-2{transform:translateY(-8px) rotate(-3.5deg); transition-delay:.22s;}
   .folder-paper h3{font-family:'Fraunces',serif; font-weight:500; font-size:24px; margin:0 0 10px;}
   .folder-paper .dots{display:flex; gap:7px; margin-bottom:10px;}
-  .folder-paper .dots .dot{width:30px; height:30px; border-radius:50%; border:1px solid var(--line);}
+  .folder-paper .dots .dot{width:30px; height:30px; border-radius:50%; border:1px solid var(--line); cursor:pointer; transition:transform .2s ease;}
+  .folder-paper .dots .dot:hover{transform:scale(1.2);}
   .folder-paper .tl{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);}
   .folder-paper .tl b{color:var(--ink); font-weight:500;}
   .folder-front{
@@ -167,25 +170,36 @@
   .weights div:last-child{border-bottom:none;}
   .weights .w-light{font-weight:300;} .weights .w-regular{font-weight:400;} .weights .w-bold{font-weight:700;}
 
-  /* Tokens */
-  .tokens{display:grid; grid-template-columns:320px 1fr; gap:48px; max-width:1000px;}
-  @media (max-width:760px){.tokens{grid-template-columns:1fr; gap:32px;}}
-  .token-col h4{font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin:0 0 18px; font-weight:500;}
-  .token{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+  /* Lab: tokens + contrast bench */
+  .lab-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:1000px;}
+  @media (max-width:860px){.lab-grid{grid-template-columns:1fr;}}
+  .token-col h4{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase;
+    letter-spacing:0.1em; color:var(--accent); margin:0 0 18px; font-weight:500;
+  }
+  .token{display:flex; align-items:center; gap:14px; margin-bottom:14px; padding:10px 12px; border:1px solid transparent; border-radius:var(--radius); transition:border-color .2s ease, background .2s ease; cursor:default;}
+  .token:hover{border-color:var(--accent); background:var(--glow);}
   .token .sw{width:48px; height:48px; border:1px solid var(--line); border-radius:var(--radius); flex:none;}
   .token .t-role{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; color:var(--ink-soft); letter-spacing:0.06em;}
   .token .t-hex{font-family:'IBM Plex Mono',monospace; font-size:14px;}
-  .scale-row{border-bottom:1px solid var(--line); padding:12px 0;}
-  .scale-row:last-child{border-bottom:none;}
-
-  /* Steps */
-  .steps{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:1000px;}
-  @media (max-width:760px){.steps{grid-template-columns:1fr;}}
-  .step{padding:32px 28px; transition:transform .25s ease, border-color .25s ease;}
-  .step:hover{transform:translateY(-5px); border-color:var(--accent);}
-  .step .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent); letter-spacing:0.12em; display:block; margin-bottom:14px;}
-  .step h3{font-family:'Fraunces',serif; font-weight:500; font-size:23px; margin:0 0 12px;}
-  .step p{font-size:15px; line-height:1.7; color:var(--ink-soft); margin:0;}
+  .token .t-lum{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); margin-left:auto; text-align:right;}
+  .bench{padding:28px;}
+  .bench h4{font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin:0 0 6px; font-weight:500;}
+  .bench p.cap{font-size:14px; color:var(--ink-soft); margin:0 0 18px;}
+  .cl-stage{border:1px solid var(--line); border-radius:var(--radius); padding:30px 20px; text-align:center; margin-bottom:18px; transition:background .2s ease;}
+  .cl-stage .big{font-size:64px; font-weight:600; line-height:1; transition:color .15s ease;}
+  .cl-stage .hexline{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); margin-top:10px;}
+  .bench input[type=range]{width:100%; accent-color:var(--accent); cursor:pointer;}
+  .cl-read{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .cl-ratio{font-family:'Fraunces',serif; font-size:34px; font-weight:500;}
+  .cl-ratio small{font-size:17px; color:var(--ink-soft);}
+  .stamp{display:inline-block; border:2px solid var(--pass); color:var(--pass);
+    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:500;
+    letter-spacing:0.12em; text-transform:uppercase; padding:8px 16px; border-radius:3px;
+    transform:rotate(-4deg); transition:all .2s ease;}
+  .stamp.fail{border-color:var(--fail); color:var(--fail);}
+  .bar{height:8px; border:1px solid var(--line); border-radius:4px; margin-top:14px; overflow:hidden;}
+  .bar i{display:block; height:100%; width:0; background:var(--accent); transition:width .15s ease;}
 
   /* Sheets */
   .sheets{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;}
@@ -193,7 +207,7 @@
   .sheet{padding:24px; transition:transform .25s ease, border-color .25s ease;}
   .sheet:hover{transform:translateY(-5px); border-color:var(--accent);}
   .sheet .frame{display:flex; gap:7px; margin-bottom:14px;}
-  .sheet .frame .dot{width:34px; height:34px; border-radius:50%; border:1px solid var(--line); transform:scale(.3); opacity:0; transition:transform .45s cubic-bezier(.2,.9,.3,1.4), opacity .3s ease;}
+  .sheet .frame .dot{width:34px; height:34px; border-radius:50%; border:1px solid var(--line); transform:scale(.3); opacity:0; transition:transform .45s cubic-bezier(.2,.9,.3,1.4), opacity .3s ease; cursor:pointer;}
   .sheet.in .frame .dot{transform:none; opacity:1;}
   .sheet.in .frame .dot:nth-child(2){transition-delay:.07s;}
   .sheet.in .frame .dot:nth-child(3){transition-delay:.14s;}
@@ -207,14 +221,17 @@
   .sheet .ind, .sheet h3{opacity:0; transform:translateY(8px); transition:opacity .45s ease .1s, transform .45s ease .1s;}
   .sheet.in .ind, .sheet.in h3{opacity:1; transform:none;}
   .sheet .data, .sheet p{opacity:0; transform:translateY(10px); transition:opacity .5s ease .5s, transform .5s ease .5s;}
+  .sheet .data, .sheet p{transition-delay:.55s;}
   .sheet.in .data, .sheet.in p{opacity:1; transform:none;}
 
-  /* Claims */
-  .claims{display:grid; grid-template-columns:repeat(3, 1fr); gap:36px; max-width:1000px;}
-  @media (max-width:760px){.claims{grid-template-columns:1fr;}}
-  .claim h3{font-family:'Fraunces',serif; font-weight:500; font-size:22px; margin:0 0 12px;}
-  .claim p{font-size:15.5px; line-height:1.75; color:var(--ink-soft); margin:0;}
-  .claim b{color:var(--ink);}
+  /* Steps */
+  .steps{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:1000px;}
+  @media (max-width:760px){.steps{grid-template-columns:1fr;}}
+  .step{padding:32px 28px; transition:transform .25s ease, border-color .25s ease;}
+  .step:hover{transform:translateY(-5px); border-color:var(--accent);}
+  .step .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent); letter-spacing:0.12em; display:block; margin-bottom:14px;}
+  .step h3{font-family:'Fraunces',serif; font-weight:500; font-size:23px; margin:0 0 12px;}
+  .step p{font-size:15px; line-height:1.7; color:var(--ink-soft); margin:0;}
 
   /* CTA */
   .cta-block{margin-top:88px; padding:72px 56px; max-width:1000px; position:relative; overflow:hidden;}
@@ -230,7 +247,6 @@
   footer.site a{color:var(--ink-soft); text-decoration:none;}
   footer.site a:hover{color:var(--ink);}
 
-  /* Inspect readout */
   #inspectBar{
     position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(80px); z-index:55;
     background:var(--card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
@@ -284,54 +300,54 @@
 <div class="grain" aria-hidden="true"></div>
 
 <nav class="rail" aria-label="Index">
-  <a href="#brief" data-ch="brief"><b>01</b>Brief</a>
-  <a href="#sample" data-ch="sample"><b>02</b>Sample</a>
-  <a href="#proof" data-ch="proof"><b>03</b>Proof</a>
-  <a href="#kits" data-ch="kits"><b>04</b>Kits</a>
-  <a href="#begin" data-ch="begin"><b>05</b>Begin</a>
+  <a href="#brief" data-ch="brief"><b>01</b>Calibrate</a>
+  <a href="#sample" data-ch="sample"><b>02</b>Specimen</a>
+  <a href="#analyze" data-ch="analyze"><b>03</b>Analyze</a>
+  <a href="#kits" data-ch="kits"><b>04</b>Observe</a>
+  <a href="#begin" data-ch="begin"><b>05</b>Result</a>
   <span class="folio" id="folioNow">p.01 / 05</span>
 </nav>
 
 <div class="wrap">
 
   <header class="top">
-    <a class="brandmark" href="#brief">Specimen<span>.</span><small>CHAMBER 01</small></a>
+    <a class="brandmark" href="#brief">Specimen<span>.</span><small>LAB 01</small></a>
     <nav class="main">
       <span class="tc"><i></i><span id="timecode">00:00:00</span></span>
-      <a href="#proof"><span class="ch">03</span>Proof</a>
-      <a href="#kits"><span class="ch">04</span>Kits</a>
+      <a href="#analyze"><span class="ch">03</span>Analyze</a>
+      <a href="#kits"><span class="ch">04</span>Observe</a>
       <a href="app/">Open the app</a>
       <a href="#" title="Accounts are coming soon">Sign in</a>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Light</button>
     </nav>
   </header>
 
-  <!-- 01 BRIEF -->
+  <!-- 01 CALIBRATE -->
   <div class="hero" id="brief">
     <div>
-      <div class="folio-line"><span>Chapter 01, Brief</span><span class="pg">p.01 / 05</span></div>
-      <span class="eyebrow">A working specimen, not a mockup</span>
-      <h1>Brief in, <em>brand out.</em></h1>
-      <p class="lede">Describe your brand. In about two minutes you get a palette with named roles, a heading and body type pairing, and a written rationale. Generated, measured, and ready to refine. The chamber around you is built from a real kit's five colors.</p>
+      <div class="folio-line"><span>Experiment 01, Calibrate</span><span class="pg">p.01 / 05</span></div>
+      <span class="eyebrow">The lab is warm, instruments nominal</span>
+      <h1 data-split>Brief in, <em>brand out.</em></h1>
+      <p class="lede">State your <b>brief</b> like a hypothesis. In about two minutes the lab returns a palette with named roles, a heading and body type pairing, and a written rationale. Every reading below is <b>measured, not claimed</b>. Drag the specimen word behind you. Touch the headlines, they jump.</p>
       <div class="hero-cta">
-        <a class="btn" href="app/">Create your first kit</a>
-        <a class="btn ghost" href="#sample">Open a sample</a>
+        <a class="btn magnetic" href="app/">Run experiment 01</a>
+        <a class="btn ghost magnetic" href="#sample">Inspect a specimen</a>
       </div>
       <div class="hero-stats">
         <div class="stat"><div class="v"><span data-count="13.9" data-dec="1">0</span><small>:1</small></div><div class="k">Contrast, computed</div></div>
         <div class="stat"><div class="v"><span data-count="2000" data-plus="1">0</span><small>+</small></div><div class="k">Live Google Fonts</div></div>
-        <div class="stat"><div class="v"><span data-count="2">0</span><small>min</small></div><div class="k">Per kit</div></div>
+        <div class="stat"><div class="v"><span data-count="2">0</span><small>min</small></div><div class="k">Per assay</div></div>
       </div>
     </div>
-    <div class="page-nav" style="max-width:1240px;"><span></span><a href="#sample">Next <span class="ch">02</span> Sample &rarr;</a></div>
+    <div class="page-nav" style="max-width:1240px;"><span></span><a href="#sample">Next <span class="ch">02</span> Specimen &rarr;</a></div>
   </div>
 
-  <!-- 02 SAMPLE -->
+  <!-- 02 SPECIMEN -->
   <section class="chapter reveal" id="sample">
-    <div class="folio-line"><span>Chapter 02, Sample</span><span class="pg">p.02 / 05</span></div>
+    <div class="folio-line"><span>Experiment 02, Specimen</span><span class="pg">p.02 / 05</span></div>
     <span class="eyebrow">Fresh from the logbook</span>
-    <h2 class="ch-title"><span class="no">02</span>Open a kit.</h2>
-    <p class="ch-sub">Every sample is a real generation. Hover the dots to inspect each part like a lens element, then generate another straight from the log. Drag the chamber to spin it, click any floating letter to inspect its token.</p>
+    <h2 class="ch-title" data-split><span class="no">02</span>Open a specimen.</h2>
+    <p class="ch-sub">Every sample is a real generation. Hover the dots to assay each part. Generate another straight from the log.</p>
     <div class="folder-scene" style="margin:8px 0 0;">
       <div class="folder" id="folder">
         <div class="folder-tab"></div>
@@ -344,49 +360,59 @@
         <div class="folder-front"><span>SPECIMEN</span></div>
       </div>
       <div class="sample-actions">
-        <button type="button" class="btn" id="reshuffleBtn">Generate a sample</button>
+        <button type="button" class="btn magnetic" id="reshuffleBtn">Assay another</button>
       </div>
       <p class="sample-meta" id="sampleMeta"></p>
     </div>
-    <div class="page-nav" style="max-width:1240px;"><a href="#brief">&larr; Prev <span class="ch">01</span> Brief</a><a href="#proof">Next <span class="ch">03</span> Proof &rarr;</a></div>
+    <div class="page-nav" style="max-width:1240px;"><a href="#brief">&larr; Prev <span class="ch">01</span> Calibrate</a><a href="#analyze">Next <span class="ch">03</span> Analyze &rarr;</a></div>
   </section>
 
-  <!-- 03 PROOF -->
-  <section class="chapter reveal" id="proof">
-    <div class="folio-line"><span>Chapter 03, Proof</span><span class="pg">p.03 / 05</span></div>
-    <span class="eyebrow">The type tester</span>
-    <h2 class="ch-title"><span class="no">03</span>Every pairing, proved on the page.</h2>
-    <p class="ch-sub">Specimen never names fonts from memory. It picks from Google's live catalog, then shows the actual faces at work: capitals, lowercase, numerals, weights.</p>
+  <!-- 03 ANALYZE -->
+  <section class="chapter reveal" id="analyze">
+    <div class="folio-line"><span>Experiment 03, Analyze</span><span class="pg">p.03 / 05</span></div>
+    <span class="eyebrow">The bench</span>
+    <h2 class="ch-title" data-split><span class="no">03</span>Measure everything.</h2>
+    <p class="ch-sub">One TestCo kit under the lens. Hover any token for its luminance reading. Then work the contrast bench yourself: drag the slider until the stamp flips.</p>
     <div class="rule" data-rule></div>
-    <div class="specimen card" style="margin-top:36px; max-width:1000px;">
+    <div class="lab-grid" style="margin-top:36px;">
       <div>
-        <div class="label">Fraunces, uppercase and lowercase</div>
-        <div class="glyphs" style="font-family:'Fraunces',serif; font-size:32px; line-height:1.4; word-break:break-all;">ABCDEFGHI<br>JKLMNOPQR<br>STUVWXYZ<br>abcdefgh<br>ijklmnopqr<br>stuvwxyz</div>
-      </div>
-      <div>
-        <div class="label">Fraunces, numerals and punctuation</div>
-        <div class="nums" style="font-family:'Fraunces',serif; font-size:28px; line-height:1.55;">0123456789<br>!?&amp; .,:;(){} /<br>“ ” ‘ ’ +</div>
-        <div class="label" style="margin-top:22px;">Inter, weights</div>
-        <div class="weights" style="font-family:'Inter',sans-serif;">
-          <div class="w-light" style="border-bottom:1px solid var(--line); padding:10px 0; font-size:26px; font-weight:300;">Light, trustworthy modern</div>
-          <div class="w-regular" style="border-bottom:1px solid var(--line); padding:10px 0; font-size:26px; font-weight:400;">Regular, trustworthy modern</div>
-          <div class="w-bold" style="padding:10px 0; font-size:26px; font-weight:700;">Bold, trustworthy modern</div>
+        <div class="token-col">
+          <h4>Color tokens, TestCo</h4>
+          <div class="token" data-hex="#1D4ED8" data-role="Primary" data-lum="0.088"><span class="sw" style="background:#1D4ED8"></span><span><span class="t-role">Primary</span><br><span class="t-hex">#1D4ED8</span></span><span class="t-lum">L 0.088</span></div>
+          <div class="token" data-hex="#0EA5E9" data-role="Secondary" data-lum="0.312"><span class="sw" style="background:#0EA5E9"></span><span><span class="t-role">Secondary</span><br><span class="t-hex">#0EA5E9</span></span><span class="t-lum">L 0.312</span></div>
+          <div class="token" data-hex="#F59E0B" data-role="Accent" data-lum="0.382"><span class="sw" style="background:#F59E0B"></span><span><span class="t-role">Accent</span><br><span class="t-hex">#F59E0B</span></span><span class="t-lum">L 0.382</span></div>
+          <div class="token" data-hex="#F8FAFC" data-role="Background" data-lum="0.945"><span class="sw" style="background:#F8FAFC"></span><span><span class="t-role">Background</span><br><span class="t-hex">#F8FAFC</span></span><span class="t-lum">L 0.945</span></div>
+          <div class="token" data-hex="#1E293B" data-role="Neutral / Text" data-lum="0.024"><span class="sw" style="background:#1E293B"></span><span><span class="t-role">Neutral / Text</span><br><span class="t-hex">#1E293B</span></span><span class="t-lum">L 0.024</span></div>
         </div>
       </div>
+      <div class="bench card dogear">
+        <h4>Contrast bench, live assay</h4>
+        <p class="cap">Slide the text tone. The ratio is computed per WCAG against #F8FAFC. Floor: 4.5:1.</p>
+        <div class="cl-stage" id="clStage" style="background:#F8FAFC;">
+          <div class="cl-big" id="clText" style="color:#1E293B;">Aa</div>
+          <div class="hexline" id="clHex">#1E293B · L 0.024</div>
+        </div>
+        <input type="range" id="clRange" min="4" max="98" value="12" aria-label="Text lightness">
+        <div class="cl-read">
+          <span class="cl-ratio"><span id="clRatio">–</span><small>:1</small></span>
+          <span class="stamp" id="clStamp">…</span>
+        </div>
+        <div class="bar"><i id="clBar"></i></div>
+      </div>
     </div>
-    <div class="page-nav" style="max-width:1240px;"><a href="#sample">&larr; Prev <span class="ch">02</span> Sample</a><a href="#kits">Next <span class="ch">04</span> Kits &rarr;</a></div>
+    <div class="page-nav" style="max-width:1240px;"><a href="#sample">&larr; Prev <span class="ch">02</span> Specimen</a><a href="#kits">Next <span class="ch">04</span> Observe &rarr;</a></div>
   </section>
 
-  <!-- 04 KITS -->
+  <!-- 04 OBSERVE -->
   <section class="chapter reveal" id="kits">
-    <div class="folio-line"><span>Chapter 04, Kits</span><span class="pg">p.04 / 05</span></div>
+    <div class="folio-line"><span>Experiment 04, Observe</span><span class="pg">p.04 / 05</span></div>
     <span class="eyebrow">From the logbook</span>
-    <h2 class="ch-title"><span class="no">04</span>Contact sheets, real briefs.</h2>
-    <p class="ch-sub">Pulled from actual generations across food, fintech, and logistics. Hover any dot to inspect it. Kits you make land in History, ready to reopen.</p>
+    <h2 class="ch-title" data-split><span class="no">04</span>Contact sheets, real briefs.</h2>
+    <p class="ch-sub">Pulled from actual generations across food, fintech, and logistics. Hover any dot to assay it. Kits you make land in History, ready to reopen.</p>
     <div class="rule" data-rule></div>
     <div class="sheets" style="margin-top:36px;">
       <div class="sheet card dogear reveal" data-delay="1">
-        <div class="frame" data-kit="seedco">
+        <div class="frame">
           <span class="dot" style="background:#E63946"></span>
           <span class="dot" style="background:#F1FA8C"></span>
           <span class="dot" style="background:#FFB703"></span>
@@ -399,7 +425,7 @@
         <p>Seed logo colors lead as primary and secondary, with a golden accent for appetite appeal on cream.</p>
       </div>
       <div class="sheet card dogear reveal" data-delay="2">
-        <div class="frame" data-kit="testco">
+        <div class="frame">
           <span class="dot" style="background:#1D4ED8"></span>
           <span class="dot" style="background:#0EA5E9"></span>
           <span class="dot" style="background:#F59E0B"></span>
@@ -412,7 +438,7 @@
         <p>Deep blue trust base with an amber energy accent. Red was explicitly avoided per the brief.</p>
       </div>
       <div class="sheet card dogear reveal" data-delay="3">
-        <div class="frame" data-kit="supabasecheck">
+        <div class="frame">
           <span class="dot" style="background:#1A3A5C"></span>
           <span class="dot" style="background:#2E86AB"></span>
           <span class="dot" style="background:#27AE60"></span>
@@ -425,26 +451,51 @@
         <p>Navy stability with a growth green accent. Tradition set against forward motion.</p>
       </div>
     </div>
-    <div class="page-nav" style="max-width:1240px;"><a href="#proof">&larr; Prev <span class="ch">03</span> Proof</a><a href="#begin">Next <span class="ch">05</span> Begin &rarr;</a></div>
+    <div class="page-nav" style="max-width:1240px;"><a href="#analyze">&larr; Prev <span class="ch">03</span> Analyze</a><a href="#begin">Next <span class="ch">05</span> Result &rarr;</a></div>
   </section>
 
-  <!-- 05 BEGIN -->
+  <!-- PROCEDURE -->
+  <section class="chapter reveal" id="how">
+    <span class="eyebrow">Procedure</span>
+    <h2 class="ch-title" data-split>Describe. Generate. Refine.</h2>
+    <p class="ch-sub">Three steps, one continuous loop. Every iteration is versioned and logged to your history.</p>
+    <div class="rule" data-rule></div>
+    <div class="steps" style="margin-top:36px;">
+      <div class="step card reveal" data-delay="1">
+        <span class="num">01</span>
+        <h3>Describe</h3>
+        <p>Name, industry, mood, and colors to avoid, plus an optional logo. Logo colors are read in your browser and sent as seed tones. The image never leaves your machine.</p>
+      </div>
+      <div class="step card reveal" data-delay="2">
+        <span class="num">02</span>
+        <h3>Generate</h3>
+        <p>Your brief meets the live font catalog and real design constraints: 60-30-10 balance, color psychology, and a contrasting but readable pairing. A full kit returns in about two minutes.</p>
+      </div>
+      <div class="step card reveal" data-delay="3">
+        <span class="num">03</span>
+        <h3>Refine</h3>
+        <p>Nudge it in plain words. Try more playful or swap the accent. Only the requested change moves and everything else holds. Each version is logged to your history.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 RESULT -->
   <section class="chapter reveal" id="begin">
-    <div class="folio-line"><span>Chapter 05, Begin</span><span class="pg">p.05 / 05</span></div>
-    <span class="eyebrow">Begin</span>
-    <h2 class="ch-title"><span class="no">05</span>Set your first kit.</h2>
+    <div class="folio-line"><span>Experiment 05, Result</span><span class="pg">p.05 / 05</span></div>
+    <span class="eyebrow">Result</span>
+    <h2 class="ch-title" data-split><span class="no">05</span>Set your first kit.</h2>
     <p class="ch-sub">Free while in the specimen stage. Takes about two minutes, and every version stays in your history.</p>
     <div class="cta-block card" style="margin-top:0;">
-      <span class="eyebrow">Index complete</span>
-      <h2>Brief in, <em>brand out.</em></h2>
+      <span class="eyebrow">Assay complete</span>
+      <h2 data-split>Brief in, <em>brand out.</em></h2>
       <p>One form, one kit, infinite refines. Accounts are coming soon. Sign in will live here.</p>
-      <a class="btn" href="app/">Create your first kit</a>
+      <a class="btn magnetic" href="app/">Run your assay</a>
       <p class="fine">Set in Fraunces and IBM Plex · <a href="#">Sign in</a> (soon)</p>
     </div>
   </section>
 
   <footer class="site">
-    <span>Specimen, a brand kit generator · Index 2026</span>
+    <span>Specimen Lab · Index 2026</span>
     <span><a href="app/">App</a> · <a href="#">Sign in</a> · <a href="#brief">Top</a> · <span id="fpsFoot">CHAMBER -- FPS</span></span>
   </footer>
 
@@ -497,6 +548,64 @@ function escapeHtml(str){
   }[m]));
 }
 
+/* Split headlines: every letter jumps on hover. */
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = window.matchMedia && window.matchMedia('(hover:hover)').matches;
+(function splitText(){
+  if (reduceMotion) return;
+  document.querySelectorAll('[data-split]').forEach((el) => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => {
+      const frag = document.createDocumentFragment();
+      Array.from(node.textContent).forEach((ch) => {
+        if (ch === ' ' || ch === '\n') { frag.appendChild(document.createTextNode(' ')); return; }
+        const s = document.createElement('span');
+        s.className = 'ch';
+        s.textContent = ch;
+        s.addEventListener('mouseenter', () => {
+          s.animate(
+            [{ transform: 'translateY(0) rotate(0)' },
+             { transform: 'translateY(-9px) rotate(-4deg)', offset: 0.45 },
+             { transform: 'translateY(0) rotate(0)' }],
+            { duration: 340, easing: 'cubic-bezier(.2,.9,.3,1.2)' }
+          );
+        });
+        frag.appendChild(s);
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+  });
+})();
+
+/* Magnetic buttons. */
+(function magnetic(){
+  if (reduceMotion || !finePointer) return;
+  const els = Array.from(document.querySelectorAll('.magnetic'));
+  if (!els.length) return;
+  let raf = null, mx = -9999, my = -9999;
+  function frame(){
+    raf = null;
+    els.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const dx = mx - cx, dy = my - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      if (dist < 90) {
+        const pull = (90 - dist) / 90 * 7;
+        el.style.transform = 'translate(' + (dx / dist * pull).toFixed(1) + 'px,' + (dy / dist * pull).toFixed(1) + 'px)';
+      } else if (el.style.transform) {
+        el.style.transform = '';
+      }
+    });
+  }
+  window.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    if (!raf) raf = requestAnimationFrame(frame);
+  }, { passive: true });
+})();
+
 /* Counting meters. */
 let countersStarted = false;
 function startCounters(){
@@ -529,12 +638,12 @@ if ('IntersectionObserver' in window) {
   startCounters();
 }
 
-/* Index rail + folio readout. */
+/* Index rail + folio readout + chamber chapter. */
 if ('IntersectionObserver' in window) {
   const railLinks = Array.from(document.querySelectorAll('.rail a'));
   const byId = {};
   railLinks.forEach((a) => { byId[a.dataset.ch] = a; });
-  const order = ['brief', 'sample', 'proof', 'kits', 'begin'];
+  const order = ['brief', 'sample', 'analyze', 'kits', 'begin'];
   const folioNow = document.getElementById('folioNow');
   const secObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -638,7 +747,7 @@ if ('IntersectionObserver' in window) {
 }
 reshuffleBtn.addEventListener('click', async () => {
   reshuffleBtn.disabled = true;
-  reshuffleBtn.textContent = 'Pulling from the log…';
+  reshuffleBtn.textContent = 'Assaying…';
   sampleMeta.textContent = 'Asking the logbook for a kit…';
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 8000);
@@ -655,11 +764,44 @@ reshuffleBtn.addEventListener('click', async () => {
     clearTimeout(timer);
     replayFolder();
     reshuffleBtn.disabled = false;
-    reshuffleBtn.textContent = 'Generate a sample';
+    reshuffleBtn.textContent = 'Assay another';
   }
 });
 
-/* Global inspect readout for every swatch on the page. */
+/* Contrast bench: drag the tone, flip the stamp. */
+(function bench(){
+  const range = document.getElementById('clRange');
+  const text = document.getElementById('clText');
+  const stage = document.getElementById('clStage');
+  const ratioEl = document.getElementById('clRatio');
+  const stamp = document.getElementById('clStamp');
+  const bar = document.getElementById('clBar');
+  const hexEl = document.getElementById('clHex');
+  if (!range) return;
+  const BG = '#F8FAFC';
+  function paint(){
+    const L = parseInt(range.value, 10);
+    const hex = 'hsl(222, 30%, ' + L + '%)';
+    text.style.color = hex;
+    const c = document.createElement('canvas').getContext('2d');
+    c.fillStyle = hex;
+    const rgb = c.fillStyle;
+    const m = rgb.match(/\d+/g).map(Number);
+    const toHex = '#' + m.map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+    const r = contrastRatio(toHex, BG);
+    ratioEl.textContent = r.toFixed(1);
+    hexEl.textContent = toHex + ' · L ' + channelLum(toHex).toFixed(3);
+    const pass = r >= 4.5;
+    stamp.textContent = pass ? 'AA PASS' : 'AA FAIL';
+    stamp.classList.toggle('fail', !pass);
+    bar.style.width = Math.min(r / 21 * 100, 100) + '%';
+    bar.style.background = pass ? 'var(--pass)' : 'var(--fail)';
+  }
+  range.addEventListener('input', paint);
+  paint();
+})();
+
+/* Global inspect readout. */
 const inspectBar = document.getElementById('inspectBar');
 let inspectTimer = null;
 function inspectPart(role, hex, kit){
@@ -679,6 +821,16 @@ function inspectPart(role, hex, kit){
   inspectTimer = setTimeout(() => inspectBar.classList.remove('show'), 2600);
   if (window.__chamberFocusHex) window.__chamberFocusHex(hex);
 }
+document.querySelectorAll('.token').forEach((tok) => {
+  tok.addEventListener('mouseenter', () => {
+    inspectBar.innerHTML = 'TOKEN <b>' + escapeHtml(tok.dataset.role || '') + '</b> · HEX <b>' +
+      escapeHtml(tok.dataset.hex || '') + '</b> · LUMINANCE <b>' + escapeHtml(tok.dataset.lum || '') + '</b>';
+    inspectBar.classList.add('show');
+    clearTimeout(inspectTimer);
+    inspectTimer = setTimeout(() => inspectBar.classList.remove('show'), 2600);
+    if (window.__chamberFocusHex) window.__chamberFocusHex(tok.dataset.hex);
+  });
+});
 document.querySelectorAll('.sheet .frame .dot').forEach((d) => {
   d.addEventListener('mouseenter', () => {
     const card = d.closest('.sheet');
@@ -730,7 +882,7 @@ if (reduceMotion || !window.WebGLRenderingContext) {
   host.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x101214, 0.062);
+  scene.fog = new THREE.FogExp2(0x101214, 0.058);
   const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(0, 0.4, 13);
 
@@ -749,24 +901,18 @@ if (reduceMotion || !window.WebGLRenderingContext) {
   const group = new THREE.Group();
   scene.add(group);
   const WORD = 'SPECIMEN';
-  const PALETTE = [
-    { hex: '#1D4ED8', role: 'Primary' },
-    { hex: '#0EA5E9', role: 'Secondary' },
-    { hex: '#F59E0B', role: 'Accent' },
-    { hex: '#F8FAFC', role: 'Background' },
-    { hex: '#1E293B', role: 'Neutral / Text' }
-  ];
+  const PALETTE = ['#1D4ED8', '#0EA5E9', '#F59E0B', '#F8FAFC', '#1E293B'];
   const letters = [];
   let cursor = 0;
-  const sizes = [];
-  [...WORD].forEach((ch, i) => {
-    const geo = new TextGeometry(ch, {
+  const widths = [];
+  [...WORD].forEach((ch) => {
+    const g = new TextGeometry(ch, {
       font: font, size: 1.7, height: 0.45,
       curveSegments: 6, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.02, bevelSegments: 2
     });
-    geo.computeBoundingBox();
-    const w = geo.boundingBox.max.x - geo.boundingBox.min.x;
-    sizes.push(w);
+    g.computeBoundingBox();
+    const w = g.boundingBox.max.x - g.boundingBox.min.x;
+    widths.push(w);
     cursor += w;
   });
   const total = cursor + (WORD.length - 1) * 0.55;
@@ -776,25 +922,42 @@ if (reduceMotion || !window.WebGLRenderingContext) {
       font: font, size: 1.7, height: 0.45,
       curveSegments: 6, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.02, bevelSegments: 2
     });
-    const entry = PALETTE[i % PALETTE.length];
+    const hex = PALETTE[i % PALETTE.length];
     const mat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(entry.hex), roughness: 0.32, metalness: 0.6,
+      color: new THREE.Color(hex), roughness: 0.32, metalness: 0.6,
       transparent: true, opacity: 0.94,
-      emissive: new THREE.Color(entry.hex), emissiveIntensity: 0.12
+      emissive: new THREE.Color(hex), emissiveIntensity: 0.12
     });
     const m = new THREE.Mesh(geo, mat);
-    geo.computeBoundingBox();
-    const w = geo.boundingBox.max.x - geo.boundingBox.min.x;
+    const w = widths[i];
     m.position.set(x + w / 2, Math.sin(i * 0.9) * 0.45 - 0.4, Math.cos(i * 0.7) * 0.8 - 1.5);
     m.rotation.y = -0.18;
-    m.userData = {
-      hex: entry.hex.toUpperCase(), role: entry.role, base: 1,
-      phase: i * 1.1, baseY: m.position.y, char: ch
-    };
+    m.userData = { hex: hex.toUpperCase(), base: 1, phase: i * 1.1, baseY: m.position.y, char: ch };
     x += w + 0.55;
     group.add(m);
     letters.push(m);
   });
+
+  /* Scanner ring + sweep plane: the instrument around the word. */
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(7.2, 0.035, 12, 128),
+    new THREE.MeshBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.35 })
+  );
+  ring.rotation.x = Math.PI / 2.25;
+  scene.add(ring);
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(8.6, 0.02, 12, 128),
+    new THREE.MeshBasicMaterial({ color: 0x8B9474, transparent: true, opacity: 0.22 })
+  );
+  ring2.rotation.x = Math.PI / 1.8;
+  ring2.rotation.y = 0.4;
+  scene.add(ring2);
+  const sweep = new THREE.Mesh(
+    new THREE.PlaneGeometry(22, 0.06),
+    new THREE.MeshBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.28, side: THREE.DoubleSide })
+  );
+  sweep.position.z = -2;
+  scene.add(sweep);
 
   const pGeo = new THREE.BufferGeometry();
   const pCount = 170, pos = new Float32Array(pCount * 3);
@@ -809,7 +972,9 @@ if (reduceMotion || !window.WebGLRenderingContext) {
 
   let mx = 0, my = 0, tx = 0, ty = 0, focusedHex = null, focusTimer = 0;
   let dragVel = 0, dragging = false, lastPX = 0, downX = 0, downY = 0;
+  let chapterMix = 0, chapterTarget = 0;
   window.__chamberFocusHex = (hex) => { focusedHex = (hex || '').toUpperCase(); focusTimer = 140; };
+  window.__chamberChapter = (idx) => { chapterTarget = idx < 0 ? 0 : (idx % 5) / 4; };
   window.__chamberTheme = (theme) => {
     scene.fog.color.set(theme !== 'light' ? 0x101214 : 0xEEEFEA);
   };
@@ -850,8 +1015,7 @@ if (reduceMotion || !window.WebGLRenderingContext) {
         window.__chamberFocusHex(hit.userData.hex);
         const bar = document.getElementById('inspectBar');
         if (bar) {
-          bar.innerHTML = 'LETTER <b>' + hit.userData.char + '</b> · TOKEN <b>' +
-            hit.userData.role + '</b> · HEX <b>' + hit.userData.hex + '</b>';
+          bar.innerHTML = 'LETTER <b>' + hit.userData.char + '</b> · HEX <b>' + hit.userData.hex + '</b>';
           bar.classList.add('show');
           clearTimeout(window.__inspectT);
           window.__inspectT = setTimeout(() => bar.classList.remove('show'), 2600);
@@ -881,11 +1045,16 @@ if (reduceMotion || !window.WebGLRenderingContext) {
       group.rotation.y += dragVel;
       dragVel *= 0.95;
     }
+    chapterMix += (chapterTarget - chapterMix) * 0.03;
     const doc = document.documentElement;
     const prog = doc.scrollHeight > window.innerHeight
       ? window.scrollY / (doc.scrollHeight - window.innerHeight) : 0;
     if (!dragging) group.rotation.y += 0.0009;
     group.rotation.x = my * 0.1;
+    ring.rotation.z = t * 0.12 + chapterMix * 2.2 + prog * 3.0;
+    ring2.rotation.z = -t * 0.07 - chapterMix * 1.4;
+    sweep.position.y = Math.sin(t * 0.5) * 2.4 + prog * 3.0 - 1.5;
+    sweep.material.opacity = 0.2 + 0.1 * Math.sin(t * 1.3);
     camera.position.x = mx * 1.2;
     camera.position.y = 0.4 - my * 0.8 + prog * 1.0;
     camera.lookAt(0, prog * 0.8 - 0.3, -1);
@@ -893,8 +1062,7 @@ if (reduceMotion || !window.WebGLRenderingContext) {
     else focusedHex = null;
     letters.forEach((m, i) => {
       const want = (focusedHex && m.userData.hex === focusedHex) ? 1.22 : 1.0;
-      const cur = m.scale.x + (want - m.scale.x) * 0.1;
-      m.scale.setScalar(cur);
+      m.scale.setScalar(m.scale.x + (want - m.scale.x) * 0.1);
       m.position.y = m.userData.baseY + Math.sin(t * 0.55 + m.userData.phase) * 0.16;
       m.rotation.y = -0.18 + Math.sin(t * 0.3 + m.userData.phase) * 0.06;
     });
